@@ -6,7 +6,7 @@ import { X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSavingsStore } from '@/store';
 import { UpdateSavingsGoalInput, SavingsGoalStatus } from '@/types/savings';
-import { SavingsGoalForm } from '@/components/savings/SavingsGoalForm';
+import { SavingsGoalForm } from '@/components/savings';
 import { Button } from '@/components/ui/Button';
 
 export default function EditSavingsGoalScreen() {

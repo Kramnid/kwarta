@@ -13,9 +13,11 @@ import * as Haptics from 'expo-haptics';
 import { useSavingsStore } from '@/store';
 import { SavingsGoalStatus } from '@/types/savings';
 import { calculateSavingsSummary } from '@/utils/savings';
-import { SavingsSummaryCard } from '@/components/savings/SavingsSummaryCard';
-import { SavingsGoalCard } from '@/components/savings/SavingsGoalCard';
-import { SavingsEmptyState } from '@/components/savings/SavingsEmptyState';
+import {
+  SavingsSummaryCard,
+  SavingsGoalCard,
+  SavingsEmptyState,
+} from '@/components/savings';
 
 type FilterType = 'all' | SavingsGoalStatus;
 

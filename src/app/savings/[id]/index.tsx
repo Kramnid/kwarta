@@ -28,11 +28,13 @@ import {
   formatDeadline,
   formatDaysRemainingText,
 } from '@/utils/savings';
-import { SavingsGoalIcon } from '@/components/savings/SavingsGoalIcon';
-import { SavingsProgressBar } from '@/components/savings/SavingsProgressBar';
-import { SavingsEntryModal } from '@/components/savings/SavingsEntryModal';
-import { SavingsHistoryList } from '@/components/savings/SavingsHistoryList';
-import { DeleteGoalConfirmModal } from '@/components/savings/DeleteGoalConfirmModal';
+import {
+  SavingsGoalIcon,
+  SavingsProgressBar,
+  SavingsEntryModal,
+  SavingsHistoryList,
+  DeleteGoalConfirmModal,
+} from '@/components/savings';
 import { Button } from '@/components/ui/Button';
 
 export default function SavingsGoalDetailScreen() {

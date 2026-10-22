@@ -9,8 +9,7 @@ import {
   calculateSavingsSummary,
   calculateGoalProgress,
 } from '@/utils/savings';
-import { SavingsGoalIcon } from '@/components/savings/SavingsGoalIcon';
-import { SavingsProgressBar } from '@/components/savings/SavingsProgressBar';
+import { SavingsGoalIcon, SavingsProgressBar } from '@/components/savings';
 
 interface DashboardSavingsWidgetProps {
   className?: string;

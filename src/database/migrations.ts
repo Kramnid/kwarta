@@ -205,6 +205,77 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
  * Handles upgrading any legacy schema without dropping user data.
  */
 export async function ensureSavingsSchema(db: SQLite.SQLiteDatabase): Promise<void> {
+  const tableInfo = await db.getAllAsync<{ name: string }>(
+    "PRAGMA table_info(savings_goals);"
+  );
+  const columnNames = new Set((tableInfo || []).map((col) => col.name));
+
+  if (tableInfo.length > 0 && !columnNames.has('status')) {
+    // Legacy prototype table from Step 1 detected without 'status'
+    let oldRows: any[] = [];
+    try {
+      oldRows = await db.getAllAsync<any>('SELECT * FROM savings_goals;');
+    } catch {
+      // Ignore if table empty or cannot read
+    }
+
+    await db.execAsync(`
+      DROP INDEX IF EXISTS idx_savings_goals_status;
+      DROP INDEX IF EXISTS idx_savings_entries_goal;
+      DROP INDEX IF EXISTS idx_savings_entries_date;
+      DROP TABLE IF EXISTS savings_entries;
+      DROP TABLE IF EXISTS savings_goals;
+    `);
+
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS savings_goals (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        target_centavos INTEGER NOT NULL CHECK(target_centavos > 0),
+        deadline TEXT NULL,
+        icon TEXT NOT NULL,
+        color TEXT NOT NULL,
+        note TEXT NULL,
+        status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'completed', 'archived')),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    `);
+
+    // Migrate any prototype rows
+    const nowIso = new Date().toISOString();
+    for (const row of oldRows) {
+      const id = String(row.id ? `goal_${row.id}` : `goal_${Date.now()}`);
+      const name = String(row.title || row.name || 'Savings Goal').trim();
+      const targetCentavos = Math.max(
+        1,
+        Math.round(row.target_centavos || row.target_amount || 100000)
+      );
+      const deadline = row.deadline || row.target_date || null;
+      const icon = row.icon || 'piggy-bank';
+      const color = row.color || '#10B981';
+      const status = row.is_completed ? 'completed' : 'active';
+
+      await db.runAsync(
+        `INSERT OR IGNORE INTO savings_goals
+         (id, name, target_centavos, deadline, icon, color, note, status, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+        [
+          id,
+          name,
+          targetCentavos,
+          deadline,
+          icon,
+          color,
+          null,
+          status,
+          row.created_at || nowIso,
+          nowIso,
+        ]
+      );
+    }
+  }
+
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS savings_goals (
       id TEXT PRIMARY KEY,

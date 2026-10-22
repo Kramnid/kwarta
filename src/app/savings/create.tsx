@@ -6,7 +6,7 @@ import { X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSavingsStore } from '@/store';
 import { CreateSavingsGoalInput } from '@/types/savings';
-import { SavingsGoalForm } from '@/components/savings/SavingsGoalForm';
+import { SavingsGoalForm } from '@/components/savings';
 
 export default function CreateSavingsGoalScreen() {
   const router = useRouter();
