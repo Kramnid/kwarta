@@ -9,18 +9,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Lightbulb } from 'lucide-react-native';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
-import {
-  InsightsHeader,
-  DateRangeSelector,
-  FinancialOverviewCards,
-  IncomeExpenseChart,
-  SpendingBreakdownChart,
-  CategorySpendingList,
-  SpendingTrendsChart,
-  FinancialInsightCard,
-  BudgetPerformanceCard,
-  InsightsEmptyState,
-} from '@/components/insights';
+import { InsightsHeader } from '@/components/insights/InsightsHeader';
+import { DateRangeSelector } from '@/components/insights/DateRangeSelector';
+import { FinancialOverviewCards } from '@/components/insights/FinancialOverviewCards';
+import { IncomeExpenseChart } from '@/components/insights/IncomeExpenseChart';
+import { SpendingBreakdownChart } from '@/components/insights/SpendingBreakdownChart';
+import { CategorySpendingList } from '@/components/insights/CategorySpendingList';
+import { SpendingTrendsChart } from '@/components/insights/SpendingTrendsChart';
+import { FinancialInsightCard } from '@/components/insights/FinancialInsightCard';
+import { BudgetPerformanceCard } from '@/components/insights/BudgetPerformanceCard';
+import { InsightsEmptyState } from '@/components/insights/InsightsEmptyState';
 
 export default function InsightsScreen() {
   const {
