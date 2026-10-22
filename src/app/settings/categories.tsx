@@ -45,8 +45,16 @@ export default function CategoryManagementScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const filteredCategories = useMemo(() => {
-    return categories.filter((c) => c.type === activeType);
+    return (categories || []).filter((c) => c.type === activeType);
   }, [categories, activeType]);
+
+  const expenseCount = useMemo(() => {
+    return (categories || []).filter((c) => c.type === 'expense').length;
+  }, [categories]);
+
+  const incomeCount = useMemo(() => {
+    return (categories || []).filter((c) => c.type === 'income').length;
+  }, [categories]);
 
   const handleOpenCreate = () => {
     try {
@@ -178,7 +186,7 @@ export default function CategoryManagementScreen() {
                 activeType === 'expense' ? 'text-rose-400' : 'text-slate-400'
               }`}
             >
-              Expense Categories ({categories.filter((c) => c.type === 'expense').length})
+              Expense Categories ({expenseCount})
             </Text>
           </Pressable>
 
@@ -200,7 +208,7 @@ export default function CategoryManagementScreen() {
                 activeType === 'income' ? 'text-emerald-400' : 'text-slate-400'
               }`}
             >
-              Income Categories ({categories.filter((c) => c.type === 'income').length})
+              Income Categories ({incomeCount})
             </Text>
           </Pressable>
         </View>

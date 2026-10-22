@@ -100,9 +100,51 @@ export default function RootLayout() {
             }}
           />
 
-          {/* Settings Screen */}
+          {/* Settings Screens */}
           <Stack.Screen
-            name="settings"
+            name="settings/index"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/profile"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/appearance"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/currency"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/categories"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/backup"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/privacy"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="settings/about"
             options={{
               headerShown: false,
             }}
