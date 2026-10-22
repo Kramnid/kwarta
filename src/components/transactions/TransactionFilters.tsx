@@ -95,12 +95,12 @@ export function TransactionFilters({
   return (
     <View className={`mb-4 ${className}`}>
       {/* 1. Search Bar */}
-      <View className="flex-row items-center bg-[#151F30] rounded-2xl px-3.5 py-1 border border-slate-700/60 mb-3">
-        <Search size={18} color="#94A3B8" className="mr-2" />
+      <View className="flex-row items-center bg-[#151F30] rounded-2xl px-4 py-1 border border-slate-700/60 mb-3 shadow-sm">
+        <Search size={18} color="#94A3B8" className="mr-2.5" />
         <TextInput
           value={filters.searchQuery || ''}
           onChangeText={handleSearchChange}
-          placeholder="Search transactions by title or note..."
+          placeholder="Search by title, note, or amount..."
           placeholderTextColor="#64748B"
           className="flex-1 text-sm text-white py-2.5 font-medium"
         />
@@ -110,38 +110,43 @@ export function TransactionFilters({
             hitSlop={8}
             className="w-6 h-6 rounded-full bg-slate-800 items-center justify-center active:bg-slate-700"
           >
-            <X size={14} color="#94A3B8" />
+            <X size={13} color="#94A3B8" strokeWidth={2.2} />
           </Pressable>
         ) : null}
       </View>
 
       {/* 2. Type Chips & Sort Button Row */}
-      <View className="flex-row items-center justify-between gap-2 mb-3">
+      <View className="flex-row items-center justify-between gap-2.5 mb-3">
         {/* Type Segment Chips */}
-        <View className="flex-row bg-[#151F30] p-1 rounded-xl border border-slate-700/60 flex-1">
+        <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/60 flex-1">
           {(['all', 'income', 'expense'] as const).map((t) => {
             const isSelected = (filters.type || 'all') === t;
             let label = 'All';
             if (t === 'income') label = 'Income';
             if (t === 'expense') label = 'Expenses';
 
+            let activeClass = 'bg-slate-800 border border-slate-600/50 shadow-sm';
+            let textActiveClass = 'text-white font-bold';
+
+            if (t === 'income') {
+              activeClass = 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm';
+              textActiveClass = 'text-emerald-400 font-bold';
+            } else if (t === 'expense') {
+              activeClass = 'bg-rose-500/20 border border-rose-500/40 shadow-sm';
+              textActiveClass = 'text-rose-400 font-bold';
+            }
+
             return (
               <Pressable
                 key={t}
                 onPress={() => handleTypeSelect(t)}
-                className={`flex-1 py-1.5 rounded-lg items-center justify-center ${
-                  isSelected ? 'bg-slate-800 shadow-sm' : ''
+                className={`flex-1 py-2 rounded-xl items-center justify-center ${
+                  isSelected ? activeClass : ''
                 }`}
               >
                 <Text
-                  className={`text-xs font-bold ${
-                    isSelected
-                      ? t === 'income'
-                        ? 'text-emerald-400'
-                        : t === 'expense'
-                        ? 'text-red-400'
-                        : 'text-white'
-                      : 'text-slate-400'
+                  className={`text-xs ${
+                    isSelected ? textActiveClass : 'text-slate-400 font-medium'
                   }`}
                 >
                   {label}
@@ -154,10 +159,10 @@ export function TransactionFilters({
         {/* Sort Modal Trigger */}
         <Pressable
           onPress={() => setSortModalVisible(true)}
-          className="flex-row items-center bg-[#151F30] px-3 py-2 rounded-xl border border-slate-700/60 active:bg-slate-800"
+          className="flex-row items-center bg-[#151F30] px-3.5 py-2.5 rounded-2xl border border-slate-700/60 active:bg-slate-800 shadow-sm"
         >
-          <ArrowUpDown size={14} color="#10B981" />
-          <Text className="text-slate-300 text-xs font-semibold ml-1.5">
+          <ArrowUpDown size={14} color="#10B981" strokeWidth={2.2} />
+          <Text className="text-slate-200 text-xs font-semibold ml-1.5">
             {currentSortLabel}
           </Text>
         </Pressable>

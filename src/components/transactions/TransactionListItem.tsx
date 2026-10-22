@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Transaction } from '@/types/finance';
 import { formatCentavosToPhp } from '@/utils/currency';
-import { getEffectiveAmount } from '@/utils/finance';
+import { formatTransactionDate } from '@/utils/date';
+import { getEffectiveAmount, getEffectiveDate } from '@/utils/finance';
 import { CategoryIcon } from './CategoryIcon';
 
 interface TransactionListItemProps {
@@ -22,6 +23,8 @@ export function TransactionListItem({
   const categoryColor = category?.color || (isIncome ? '#10B981' : '#F87171');
   const amount = getEffectiveAmount(transaction);
   const formattedAmount = formatCentavosToPhp(amount);
+  const formattedDate = formatTransactionDate(getEffectiveDate(transaction));
+  const title = transaction.title || transaction.description || 'Untitled Transaction';
 
   const handlePress = () => {
     try {
@@ -39,15 +42,15 @@ export function TransactionListItem({
     <Pressable
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`${transaction.title || 'Transaction'}, ${formattedAmount}`}
-      className="active:bg-slate-800/40 px-3.5 py-3 rounded-2xl transition-all"
+      accessibilityLabel={`${title}, ${formattedAmount}`}
+      className="active:bg-slate-800/60 px-3 py-3 rounded-2xl transition-all"
     >
       <View className="flex-row items-center justify-between">
-        {/* Left: Category Icon + Title + Category Subtitle */}
+        {/* Left: Category Icon Container + Title & Subtitle */}
         <View className="flex-row items-center flex-1 mr-3">
           <View
-            style={{ backgroundColor: `${categoryColor}20` }}
-            className="w-11 h-11 rounded-2xl items-center justify-center mr-3 border border-white/5"
+            style={{ backgroundColor: `${categoryColor}1F` }}
+            className="w-11 h-11 rounded-2xl items-center justify-center border border-white/10 mr-3 shadow-sm"
           >
             <CategoryIcon
               name={category?.icon}
@@ -61,37 +64,39 @@ export function TransactionListItem({
               numberOfLines={1}
               className="text-white text-sm font-semibold tracking-tight"
             >
-              {transaction.title || transaction.description || 'Untitled Transaction'}
+              {title}
             </Text>
-
             <View className="flex-row items-center mt-0.5">
               <Text className="text-slate-400 text-xs">
                 {category?.name || (isIncome ? 'Income' : 'Expense')}
               </Text>
-              {transaction.note ? (
+              {formattedDate ? (
                 <>
                   <Text className="text-slate-600 text-xs mx-1.5">•</Text>
-                  <Text
-                    numberOfLines={1}
-                    className="text-slate-400 text-xs flex-1"
-                  >
-                    {transaction.note}
-                  </Text>
+                  <Text className="text-slate-400 text-xs">{formattedDate}</Text>
                 </>
               ) : null}
             </View>
           </View>
         </View>
 
-        {/* Right: Formatted Amount */}
+        {/* Right: Amount Display & Note */}
         <View className="items-end">
           <Text
             className={`text-sm font-bold tracking-tight ${
-              isIncome ? 'text-emerald-400' : 'text-rose-400'
+              isIncome ? 'text-emerald-400' : 'text-slate-100'
             }`}
           >
             {isIncome ? `+${formattedAmount}` : `-${formattedAmount}`}
           </Text>
+          {transaction.note ? (
+            <Text
+              numberOfLines={1}
+              className="text-slate-500 text-[11px] mt-0.5 max-w-[130px]"
+            >
+              {transaction.note}
+            </Text>
+          ) : null}
         </View>
       </View>
 
@@ -101,3 +106,4 @@ export function TransactionListItem({
     </Pressable>
   );
 }
+

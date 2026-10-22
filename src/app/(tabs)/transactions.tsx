@@ -20,6 +20,7 @@ import { formatCentavosToPhp } from '@/utils/currency';
 import { TransactionFilters } from '@/components/transactions/TransactionFilters';
 import { TransactionListItem } from '@/components/transactions/TransactionListItem';
 import { TransactionEmptyState } from '@/components/transactions/TransactionEmptyState';
+import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { Button } from '@/components/ui/Button';
 
 export default function TransactionsScreen() {
@@ -75,131 +76,162 @@ export default function TransactionsScreen() {
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-[#0B1220]">
-      <View className="flex-1 px-5 pt-3">
-        {/* Header Bar */}
-        <View className="flex-row items-center justify-between mb-3">
-          <View>
-            <Text className="text-white text-2xl font-bold tracking-tight">
-              Transactions
-            </Text>
-            <Text className="text-slate-400 text-xs mt-0.5">
-              Track where your money goes.
-            </Text>
-          </View>
-
-          <Button
-            title="Add"
-            size="sm"
-            onPress={() => router.push('/add-transaction')}
-            leftIcon={<Plus size={16} color="#FFFFFF" className="mr-1" />}
+      <SectionList
+        sections={groupedSections}
+        keyExtractor={(item) => item.id}
+        stickySectionHeadersEnabled={false}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 96,
+        }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoadingTransactions}
+            onRefresh={handleRefresh}
+            tintColor="#10B981"
+            colors={['#10B981']}
           />
-        </View>
+        }
+        ListHeaderComponent={
+          <View className="mb-2">
+            {/* 1. Header Bar matching DashboardHeader styling */}
+            <View className="flex-row items-center justify-between mb-5 pt-1">
+              <View className="flex-1 mr-3">
+                <View className="flex-row items-center flex-wrap">
+                  <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
+                    ACTIVITY & LOGS
+                  </Text>
+                  <Text className="text-slate-600 text-xs mx-1.5">•</Text>
+                  <Text className="text-emerald-400 text-xs font-medium">
+                    {transactions.length} Total
+                  </Text>
+                </View>
 
-        {/* Search, Filter, and Sort Controls */}
-        <TransactionFilters
-          filters={filters}
-          onChangeFilters={setFilters}
-          categories={categories}
-        />
-
-        {/* Filtered Summary Card */}
-        {filteredTransactions.length > 0 && (
-          <View className="flex-row items-center justify-between bg-[#151F30] px-4 py-2.5 rounded-2xl border border-slate-700/60 mb-3">
-            <View>
-              <Text className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                {isFilterActive ? 'FILTERED RESULTS' : 'TOTAL COUNT'}
-              </Text>
-              <Text className="text-slate-300 text-xs font-semibold mt-0.5">
-                {filteredTransactions.length}{' '}
-                {filteredTransactions.length === 1
-                  ? 'transaction'
-                  : 'transactions'}
-              </Text>
-            </View>
-
-            <View className="flex-row items-center gap-4">
-              <View className="items-end">
-                <Text className="text-slate-500 text-[10px] font-semibold uppercase">
-                  Income
+                <Text className="text-white text-[26px] font-extrabold tracking-tight mt-0.5">
+                  Transactions
                 </Text>
-                <Text className="text-emerald-400 text-xs font-bold mt-0.5">
-                  +{formatCentavosToPhp(filteredIncome)}
+                <Text className="text-slate-400 text-xs mt-0.5">
+                  Track and organize every peso.
                 </Text>
               </View>
 
-              <View className="items-end">
-                <Text className="text-slate-500 text-[10px] font-semibold uppercase">
-                  Expenses
-                </Text>
-                <Text className="text-rose-400 text-xs font-bold mt-0.5">
-                  -{formatCentavosToPhp(filteredExpenses)}
-                </Text>
-              </View>
+              <Button
+                title="Add"
+                size="sm"
+                onPress={() => router.push('/add-transaction')}
+                leftIcon={<Plus size={15} color="#FFFFFF" strokeWidth={2.5} />}
+              />
             </View>
-          </View>
-        )}
 
-        {/* Transactions List */}
-        {isLoadingTransactions && transactions.length === 0 ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#10B981" />
-            <Text className="text-slate-400 text-xs mt-3">
-              Loading transactions...
-            </Text>
-          </View>
-        ) : filteredTransactions.length === 0 ? (
-          <TransactionEmptyState
-            isFiltered={!hasNoTransactionsAtAll}
-            onClearFilters={resetFilters}
-            className="mt-4"
-          />
-        ) : (
-          <SectionList
-            sections={groupedSections}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item, index, section }) => (
-              <View className="bg-[#151F30] mx-0.5 px-1 border-x border-slate-700/60">
-                <TransactionListItem
-                  transaction={item}
-                  showDivider={index < section.data.length - 1}
+            {/* 2. Overview / Filtered Summary Cards (matching dashboard SummaryCard) */}
+            {filteredTransactions.length > 0 && (
+              <View className="mb-4">
+                <View className="flex-row items-center justify-between mb-2.5 px-0.5">
+                  <View className="flex-row items-center">
+                    <Text className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+                      {isFilterActive ? 'Filtered Results' : 'Period Overview'}
+                    </Text>
+                    {isFilterActive && (
+                      <View className="ml-2 w-2 h-2 rounded-full bg-emerald-400" />
+                    )}
+                  </View>
+
+                  <View className="bg-slate-800/80 px-2.5 py-0.5 rounded-full border border-slate-700/60">
+                    <Text className="text-slate-300 text-[11px] font-semibold">
+                      {filteredTransactions.length}{' '}
+                      {filteredTransactions.length === 1
+                        ? 'transaction'
+                        : 'transactions'}
+                    </Text>
+                  </View>
+                </View>
+
+                <SummaryCard
+                  incomeCentavos={filteredIncome}
+                  expenseCentavos={filteredExpenses}
                 />
               </View>
             )}
-            renderSectionHeader={({ section: { title, totalIncome, totalExpenses } }) => (
-              <View className="bg-[#0B1220] pt-4 pb-2 px-1 flex-row items-center justify-between">
-                <Text className="text-slate-300 text-xs font-bold uppercase tracking-wider">
-                  {title}
-                </Text>
-                <View className="flex-row items-center gap-2">
-                  {totalIncome > 0 && (
-                    <Text className="text-emerald-400 text-[11px] font-semibold">
-                      +{formatCentavosToPhp(totalIncome)}
-                    </Text>
-                  )}
-                  {totalExpenses > 0 && (
-                    <Text className="text-slate-400 text-[11px] font-medium">
-                      -{formatCentavosToPhp(totalExpenses)}
-                    </Text>
-                  )}
+
+            {/* 3. Search, Filter, and Sort Controls */}
+            <TransactionFilters
+              filters={filters}
+              onChangeFilters={setFilters}
+              categories={categories}
+              className="mb-1"
+            />
+          </View>
+        }
+        renderSectionHeader={({ section: { title, totalIncome, totalExpenses } }) => (
+          <View className="bg-[#0B1220] pt-4 pb-2.5 px-0.5 flex-row items-center justify-between">
+            <Text className="text-slate-300 text-xs font-bold uppercase tracking-wider">
+              {title}
+            </Text>
+            <View className="flex-row items-center gap-2">
+              {totalIncome > 0 && (
+                <View className="bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  <Text className="text-emerald-400 text-[11px] font-semibold">
+                    +{formatCentavosToPhp(totalIncome)}
+                  </Text>
                 </View>
-              </View>
-            )}
-            renderSectionFooter={() => (
-              <View className="h-2 bg-[#151F30] rounded-b-2xl border-b border-x border-slate-700/60 mb-2" />
-            )}
-            contentContainerStyle={{ paddingBottom: 40 }}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={isLoadingTransactions}
-                onRefresh={handleRefresh}
-                tintColor="#10B981"
-                colors={['#10B981']}
-              />
-            }
-          />
+              )}
+              {totalExpenses > 0 && (
+                <View className="bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-700/50">
+                  <Text className="text-slate-300 text-[11px] font-medium">
+                    -{formatCentavosToPhp(totalExpenses)}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
         )}
-      </View>
+        renderItem={({ item, index, section }) => {
+          const isFirst = index === 0;
+          const isLast = index === section.data.length - 1;
+          const isOnly = isFirst && isLast;
+
+          let containerClass =
+            'bg-[#151F30] border-x border-slate-700/60 px-1 shadow-sm';
+          if (isOnly) {
+            containerClass =
+              'bg-[#151F30] rounded-2xl border border-slate-700/60 px-1 py-1 mb-3.5 shadow-sm';
+          } else if (isFirst) {
+            containerClass =
+              'bg-[#151F30] rounded-t-2xl border-t border-x border-slate-700/60 px-1 pt-1 shadow-sm';
+          } else if (isLast) {
+            containerClass =
+              'bg-[#151F30] rounded-b-2xl border-b border-x border-slate-700/60 px-1 pb-1 mb-3.5 shadow-sm';
+          }
+
+          return (
+            <View className={containerClass}>
+              <TransactionListItem
+                transaction={item}
+                showDivider={!isLast}
+              />
+            </View>
+          );
+        }}
+        ListEmptyComponent={
+          isLoadingTransactions && transactions.length === 0 ? (
+            <View className="py-16 items-center justify-center">
+              <ActivityIndicator size="large" color="#10B981" />
+              <Text className="text-slate-400 text-xs mt-3">
+                Loading transactions...
+              </Text>
+            </View>
+          ) : (
+            <TransactionEmptyState
+              isFiltered={!hasNoTransactionsAtAll}
+              onClearFilters={resetFilters}
+              className="mt-2"
+            />
+          )
+        }
+      />
     </SafeAreaView>
   );
 }
+

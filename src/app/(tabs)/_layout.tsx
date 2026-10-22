@@ -12,6 +12,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: '#10B981',
         tabBarInactiveTintColor: '#94A3B8',
         tabBarStyle: {
@@ -54,7 +55,7 @@ export default function TabLayout() {
         name="transactions"
         options={{
           title: 'Transactions',
-          headerTitle: 'Transactions',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <ArrowLeftRight size={size ?? 22} color={color} />
           ),
