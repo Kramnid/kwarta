@@ -80,6 +80,7 @@ export default function InsightsScreen() {
             setSelectedCategoryId(null);
             setCustomRange(start, end);
           }}
+          activeRange={analytics.range}
         />
 
         {/* Error State */}

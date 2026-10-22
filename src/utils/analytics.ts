@@ -65,6 +65,10 @@ export function formatRangeLabel(startDateStr: string, endDateStr: string): stri
   const startMonthStr = start.toLocaleDateString('en-US', { month: 'short' });
   const endMonthStr = end.toLocaleDateString('en-US', { month: 'short' });
 
+  if (startDateStr === endDateStr) {
+    return `${startMonthStr} ${start.getDate()}, ${start.getFullYear()}`;
+  }
+
   if (sameMonth) {
     return `${startMonthStr} ${start.getDate()} – ${end.getDate()}, ${start.getFullYear()}`;
   }
