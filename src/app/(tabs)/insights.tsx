@@ -65,7 +65,7 @@ export default function InsightsScreen() {
         }
       >
         {/* 1. Header */}
-        <InsightsHeader rangeLabel={analytics.range.label} />
+        <InsightsHeader />
 
         {/* 2. Date Range Selector */}
         <DateRangeSelector

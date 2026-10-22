@@ -28,9 +28,24 @@ export function SpendingTrendsChart({ points }: SpendingTrendsChartProps) {
   const [containerWidth, setContainerWidth] = useState(
     Math.max(280, windowWidth - 40)
   );
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(
-    points.length > 0 ? points.length - 1 : null
-  );
+  // Select latest point with expense activity by default
+  const defaultIndex = React.useMemo(() => {
+    if (points.length === 0) return null;
+    for (let i = points.length - 1; i >= 0; i--) {
+      if (points[i].amountCentavos > 0) {
+        return i;
+      }
+    }
+    return points.length - 1;
+  }, [points]);
+
+  const [userSelectedIndex, setUserSelectedIndex] = useState<number | null>(null);
+
+  // Derive active index: user tapped index or defaultIndex with recent activity
+  const selectedIndex =
+    userSelectedIndex !== null && userSelectedIndex >= 0 && userSelectedIndex < points.length
+      ? userSelectedIndex
+      : defaultIndex;
 
   const handleLayout = (e: LayoutChangeEvent) => {
     const width = e.nativeEvent.layout.width;
@@ -251,7 +266,7 @@ export function SpendingTrendsChart({ points }: SpendingTrendsChartProps) {
           {coords.map((c) => (
             <TouchableOpacity
               key={`touch-point-${c.point.key}`}
-              onPress={() => setSelectedIndex(c.index)}
+              onPress={() => setUserSelectedIndex(c.index)}
               activeOpacity={0.6}
               style={{ flex: 1 }}
             />

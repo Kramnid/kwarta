@@ -20,9 +20,24 @@ export function IncomeExpenseChart({ buckets }: IncomeExpenseChartProps) {
   const [containerWidth, setContainerWidth] = useState(
     Math.max(280, windowWidth - 40)
   );
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(
-    buckets.length > 0 ? buckets.length - 1 : null
-  );
+  // Select latest bucket with nonzero financial activity by default
+  const defaultIndex = React.useMemo(() => {
+    if (buckets.length === 0) return null;
+    for (let i = buckets.length - 1; i >= 0; i--) {
+      if (buckets[i].incomeCentavos > 0 || buckets[i].expenseCentavos > 0) {
+        return i;
+      }
+    }
+    return buckets.length - 1;
+  }, [buckets]);
+
+  const [userSelectedIndex, setUserSelectedIndex] = useState<number | null>(null);
+
+  // Derive active index: user tapped index or defaultIndex with recent activity
+  const selectedIndex =
+    userSelectedIndex !== null && userSelectedIndex >= 0 && userSelectedIndex < buckets.length
+      ? userSelectedIndex
+      : defaultIndex;
 
   const handleLayout = (e: LayoutChangeEvent) => {
     const width = e.nativeEvent.layout.width;
@@ -83,11 +98,27 @@ export function IncomeExpenseChart({ buckets }: IncomeExpenseChartProps) {
         {/* Legend */}
         <View className="flex-row items-center gap-3">
           <View className="flex-row items-center">
-            <View className="w-2.5 h-2.5 rounded-sm bg-emerald-500 mr-1.5" />
+            <View
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: 2,
+                backgroundColor: '#10B981',
+                marginRight: 5,
+              }}
+            />
             <Text className="text-slate-300 text-[11px] font-medium">Income</Text>
           </View>
           <View className="flex-row items-center">
-            <View className="w-2.5 h-2.5 rounded-sm bg-rose-400 mr-1.5" />
+            <View
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: 2,
+                backgroundColor: '#F87171',
+                marginRight: 5,
+              }}
+            />
             <Text className="text-slate-300 text-[11px] font-medium">Expenses</Text>
           </View>
         </View>
@@ -254,7 +285,7 @@ export function IncomeExpenseChart({ buckets }: IncomeExpenseChartProps) {
           {buckets.map((b, i) => (
             <TouchableOpacity
               key={`touch-${b.key}`}
-              onPress={() => setSelectedIndex(i)}
+              onPress={() => setUserSelectedIndex(i)}
               activeOpacity={0.6}
               style={{ flex: 1 }}
             />

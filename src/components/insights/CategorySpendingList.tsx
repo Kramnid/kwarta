@@ -85,14 +85,22 @@ export function CategorySpendingList({
               </View>
 
               {/* Progress Bar */}
-              <View className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+              <View
+                style={{
+                  width: '100%',
+                  height: 6,
+                  backgroundColor: '#1E293B',
+                  borderRadius: 999,
+                  overflow: 'hidden',
+                }}
+              >
                 <View
                   style={{
                     width: `${Math.min(Math.max(item.percentage, 0), 100)}%`,
-                    minWidth: 6,
+                    height: 6,
+                    borderRadius: 999,
                     backgroundColor: color,
                   }}
-                  className="h-full rounded-full"
                 />
               </View>
             </TouchableOpacity>

@@ -22,7 +22,8 @@ function computeCategorySlices(
   return categories.map((cat) => {
     const pct = cat.percentage;
     const strokeDash = (pct / 100) * circumference;
-    const strokeOffset = circumference - (accumulatedPct / 100) * circumference;
+    // In SVG, negative dashoffset shifts the start position forward around the circle
+    const strokeOffset = -((accumulatedPct / 100) * circumference);
     accumulatedPct += pct;
 
     return {
@@ -56,6 +57,8 @@ export function SpendingBreakdownChart({
     return computeCategorySlices(categories, circumference, selectedCategoryId);
   }, [categories, circumference, selectedCategoryId]);
 
+  const isSingleCategory = categories.length === 1;
+
   if (totalExpenses <= 0 || categories.length === 0) {
     return (
       <View className="bg-[#151F30] rounded-2xl p-5 border border-slate-700/60 mb-6 items-center shadow-sm">
@@ -64,7 +67,7 @@ export function SpendingBreakdownChart({
             <PieChart size={15} color="#10B981" />
           </View>
           <Text className="text-white font-bold text-base">
-            Spending by Category
+            Spending Breakdown
           </Text>
         </View>
 
@@ -123,31 +126,43 @@ export function SpendingBreakdownChart({
                 fill="none"
               />
 
-              {/* Category Segment Arcs */}
-              {slices.map((slice) => {
-                const color = slice.categoryColor || '#10B981';
-                return (
-                  <Circle
-                    key={`slice-${slice.categoryId}`}
-                    cx={center}
-                    cy={center}
-                    r={radius}
-                    stroke={color}
-                    strokeWidth={slice.isSelected ? strokeWidth + 4 : strokeWidth}
-                    strokeDasharray={`${slice.strokeDash} ${circumference}`}
-                    strokeDashoffset={slice.strokeOffset}
-                    strokeLinecap="butt"
-                    fill="none"
-                    opacity={
-                      selectedCategoryId
-                        ? slice.isSelected
-                          ? 1
-                          : 0.35
-                        : 0.95
-                    }
-                  />
-                );
-              })}
+              {/* If only 1 category, draw full solid stroke without dash offset to prevent SVG clipping */}
+              {isSingleCategory ? (
+                <Circle
+                  cx={center}
+                  cy={center}
+                  r={radius}
+                  stroke={categories[0].categoryColor || '#10B981'}
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                  opacity={0.95}
+                />
+              ) : (
+                slices.map((slice) => {
+                  const color = slice.categoryColor || '#10B981';
+                  return (
+                    <Circle
+                      key={`slice-${slice.categoryId}`}
+                      cx={center}
+                      cy={center}
+                      r={radius}
+                      stroke={color}
+                      strokeWidth={slice.isSelected ? strokeWidth + 4 : strokeWidth}
+                      strokeDasharray={`${slice.strokeDash} ${circumference}`}
+                      strokeDashoffset={slice.strokeOffset}
+                      strokeLinecap="butt"
+                      fill="none"
+                      opacity={
+                        selectedCategoryId
+                          ? slice.isSelected
+                            ? 1
+                            : 0.35
+                          : 0.95
+                      }
+                    />
+                  );
+                })
+              )}
             </G>
           </Svg>
 
@@ -240,7 +255,7 @@ export function SpendingBreakdownChart({
                 style={{
                   backgroundColor: isSelected ? '#1E293B' : 'transparent',
                 }}
-                className="p-2 -mx-1 rounded-xl transition-all"
+                className="p-2 -mx-1 rounded-xl"
               >
                 {/* Row: Icon, Name, Amount, Percentage */}
                 <View className="flex-row items-center justify-between mb-1.5">
@@ -279,15 +294,23 @@ export function SpendingBreakdownChart({
                   </View>
                 </View>
 
-                {/* Progress Bar */}
-                <View className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                {/* Progress Bar - Strict inline style with fixed height to prevent expansion */}
+                <View
+                  style={{
+                    width: '100%',
+                    height: 6,
+                    backgroundColor: '#1E293B',
+                    borderRadius: 999,
+                    overflow: 'hidden',
+                  }}
+                >
                   <View
                     style={{
                       width: `${Math.min(Math.max(item.percentage, 0), 100)}%`,
-                      minWidth: 6,
+                      height: 6,
+                      borderRadius: 999,
                       backgroundColor: color,
                     }}
-                    className="h-full rounded-full"
                   />
                 </View>
               </TouchableOpacity>

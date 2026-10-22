@@ -2,11 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { BarChart3 } from 'lucide-react-native';
 
-interface InsightsHeaderProps {
-  rangeLabel: string;
-}
-
-export function InsightsHeader({ rangeLabel }: InsightsHeaderProps) {
+export function InsightsHeader() {
   return (
     <View className="mb-4">
       <View className="flex-row items-center justify-between">
@@ -25,13 +21,6 @@ export function InsightsHeader({ rangeLabel }: InsightsHeaderProps) {
         <View className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 items-center justify-center">
           <BarChart3 size={20} color="#10B981" />
         </View>
-      </View>
-
-      {/* Active Range pill */}
-      <View className="mt-2.5 self-start bg-slate-800/80 px-2.5 py-1 rounded-full border border-slate-700/50">
-        <Text className="text-slate-300 text-[11px] font-medium">
-          {rangeLabel}
-        </Text>
       </View>
     </View>
   );
