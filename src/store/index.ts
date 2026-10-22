@@ -204,3 +204,4 @@ export const useAppStore = create<FinanceState>((set, get) => ({
 // Export alias for architectures looking for useFinanceStore
 export const useFinanceStore = useAppStore;
 export { useBudgetStore, useSavingsStore, useSettingsStore };
+export { useAccountsStore } from './useAccountsStore';

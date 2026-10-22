@@ -40,3 +40,4 @@ export * from './budgets';
 export * from './analytics';
 export * from './savings';
 export * from './settings';
+export * from './accounts';

@@ -7,6 +7,7 @@
 
 import * as SQLite from 'expo-sqlite';
 import { CURRENT_SCHEMA_VERSION, DEFAULT_CATEGORIES } from './schema';
+import { ensureAccountsSchema } from './accounts';
 
 export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   // Always enforce foreign keys and WAL mode
@@ -21,10 +22,11 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   );
   const currentVersion = versionRow?.user_version ?? 0;
 
-  // Ensure budgets, savings, and settings tables match modern schema
+  // Ensure budgets, savings, settings, and accounts tables match modern schema
   await ensureBudgetsSchema(db);
   await ensureSavingsSchema(db);
   await ensureSettingsSchema(db);
+  await ensureAccountsSchema(db);
 
   if (currentVersion >= CURRENT_SCHEMA_VERSION) {
     // Schema is up to date; ensure categories are seeded idempotently

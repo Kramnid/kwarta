@@ -7,6 +7,7 @@ export * from './budget';
 export * from './analytics';
 export * from './savings';
 export * from './settings';
+export * from './accounts';
 
 export interface Category {
   id: string | number;

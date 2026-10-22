@@ -150,6 +150,14 @@ export default function RootLayout() {
             }}
           />
 
+          {/* Manage Accounts & Cards Screen */}
+          <Stack.Screen
+            name="accounts/index"
+            options={{
+              headerShown: false,
+            }}
+          />
+
           {/* Create Savings Goal Modal */}
           <Stack.Screen
             name="savings/create"

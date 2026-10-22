@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { initDatabase } from '@/database';
-import { useAppStore, useSettingsStore } from '@/store';
+import { useAppStore, useSettingsStore, useAccountsStore } from '@/store';
 
 export function useDatabase() {
   const { isDatabaseReady, setDatabaseReady, dbError, setDbError } = useAppStore();
@@ -27,8 +27,9 @@ export function useDatabase() {
       if (result.success) {
         setDatabaseReady(true);
         setDbError(null);
-        // Load persisted settings and user profile into state
+        // Load persisted settings, user profile, and account cards into state
         useSettingsStore.getState().loadSettings();
+        useAccountsStore.getState().loadCards();
       } else {
         setDatabaseReady(false);
         setDbError(result.error ?? 'Unknown database error');

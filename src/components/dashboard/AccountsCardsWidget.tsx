@@ -8,10 +8,12 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
-import { Wifi } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { Wifi, ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { splitCentavosToPhp } from '@/utils/currency';
-import { useAppStore, useSettingsStore } from '@/store';
+import { useAppStore, useSettingsStore, useAccountsStore } from '@/store';
+import { AccountCard } from '@/types/accounts';
 
 interface AccountsCardsWidgetProps {
   balanceCentavos: number;
@@ -22,35 +24,60 @@ export function AccountsCardsWidget({
   balanceCentavos,
   className = '',
 }: AccountsCardsWidgetProps) {
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const cardWidth = Math.max(280, Math.min(320, width - 56));
   const cardGap = 12;
 
   const { isBalanceHidden } = useAppStore();
   const { displayName } = useSettingsStore();
+  const { cards } = useAccountsStore();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const cardholderName = (displayName.trim() || 'KWARTA MEMBER').toUpperCase();
+  // Fallback cards if database is still initializing or empty
+  const fallbackCards: AccountCard[] = [
+    {
+      id: 'fallback_debit',
+      name: 'Kwarta Signature Debit',
+      bank: 'Kwarta',
+      type: 'debit',
+      card_number_last4: '4821',
+      balance_centavos: balanceCentavos,
+      credit_limit_centavos: null,
+      cardholder_name: (displayName.trim() || 'KWARTA MEMBER').toUpperCase(),
+      expiry_date: '08/29',
+      color_primary: '#064E3B',
+      color_secondary: '#0F766E',
+      network: 'Visa',
+      is_default: 1,
+      created_at: '',
+      updated_at: '',
+    },
+    {
+      id: 'fallback_credit',
+      name: 'BPI Rewards Card',
+      bank: 'BPI',
+      type: 'credit',
+      card_number_last4: '8912',
+      balance_centavos: 0,
+      credit_limit_centavos: 5000000,
+      cardholder_name: (displayName.trim() || 'KWARTA MEMBER').toUpperCase(),
+      expiry_date: '11/30',
+      color_primary: '#8A1538',
+      color_secondary: '#4C0519',
+      network: 'Mastercard',
+      is_default: 0,
+      created_at: '',
+      updated_at: '',
+    },
+  ];
 
-  // Debit balance = live total balance
-  const isDebitPositive = balanceCentavos >= 0;
-  const { symbol: debitSymbol, formattedAmount: debitFormatted } = splitCentavosToPhp(balanceCentavos);
-  const debitDisplay = isBalanceHidden
-    ? `${debitSymbol} ••••••`
-    : `${isDebitPositive ? '' : '-'}${debitSymbol} ${debitFormatted}`;
-
-  // Credit card limit & available
-  const creditLimitCentavos = 5000000; // ₱50,000.00 credit limit
-  const creditAvailableCentavos = Math.max(0, creditLimitCentavos - Math.max(0, -balanceCentavos));
-  const { symbol: creditSymbol, formattedAmount: creditFormatted } = splitCentavosToPhp(creditAvailableCentavos);
-  const creditDisplay = isBalanceHidden
-    ? `${creditSymbol} ••••••`
-    : `${creditSymbol} ${creditFormatted}`;
+  const displayCards = cards.length > 0 ? cards : fallbackCards;
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / (cardWidth + cardGap));
-    if (index !== activeIndex && (index === 0 || index === 1)) {
+    if (index !== activeIndex && index >= 0 && index < displayCards.length) {
       setActiveIndex(index);
     }
   };
@@ -61,9 +88,16 @@ export function AccountsCardsWidget({
     } catch {}
   };
 
+  const handleManagePress = () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {}
+    router.push('/accounts' as any);
+  };
+
   return (
     <View className={`mb-5 ${className}`}>
-      {/* Section Header */}
+      {/* Section Header with Manage Shortcut */}
       <View className="flex-row items-center justify-between mb-3">
         <View className="flex-row items-center">
           <View className="w-2.5 h-2.5 rounded-full bg-emerald-400 mr-2 shadow-sm shadow-emerald-400" />
@@ -71,23 +105,25 @@ export function AccountsCardsWidget({
             Accounts
           </Text>
           <View className="ml-2 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded-full">
-            <Text className="text-slate-400 text-[10px] font-bold">2 CARDS</Text>
+            <Text className="text-slate-400 text-[10px] font-bold">
+              {displayCards.length} {displayCards.length === 1 ? 'CARD' : 'CARDS'}
+            </Text>
           </View>
         </View>
 
-        {/* Pagination Dots */}
-        <View className="flex-row items-center gap-1.5">
-          <View
-            className={`h-1.5 rounded-full transition-all ${
-              activeIndex === 0 ? 'w-4 bg-emerald-400' : 'w-1.5 bg-slate-700'
-            }`}
-          />
-          <View
-            className={`h-1.5 rounded-full transition-all ${
-              activeIndex === 1 ? 'w-4 bg-indigo-400' : 'w-1.5 bg-slate-700'
-            }`}
-          />
-        </View>
+        {/* Manage Button */}
+        <Pressable
+          onPress={handleManagePress}
+          hitSlop={8}
+          className="flex-row items-center bg-slate-800/80 border border-slate-700/80 px-2.5 py-1 rounded-full active:bg-slate-700"
+          accessibilityRole="button"
+          accessibilityLabel="Manage Accounts and Cards"
+        >
+          <Text className="text-emerald-400 text-xs font-bold mr-1">
+            Manage
+          </Text>
+          <ChevronRight size={13} color="#10B981" />
+        </Pressable>
       </View>
 
       {/* Horizontal Cards Carousel */}
@@ -104,148 +140,119 @@ export function AccountsCardsWidget({
           paddingRight: 4,
         }}
       >
-        {/* ================= CARD 1: DEBIT CARD ================= */}
-        <Pressable
-          onPress={handleCardPress}
-          style={{ width: cardWidth, height: 180 }}
-          className="rounded-3xl p-5 justify-between overflow-hidden relative border border-emerald-500/40 bg-[#064E3B] shadow-xl"
-        >
-          {/* Subtle Ambient Background Accents */}
-          <View className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-emerald-400/15" />
-          <View className="absolute -bottom-16 -left-12 w-44 h-44 rounded-full bg-teal-500/10" />
+        {displayCards.map((card) => {
+          const isDebit = card.type === 'debit';
+          const isDefault = card.is_default === 1;
 
-          {/* Top Row: Brand, Chip & Contactless */}
-          <View className="flex-row items-center justify-between z-10">
-            <View className="flex-row items-center">
-              <Text className="text-white font-extrabold text-base tracking-tight">
-                Kwarta
-              </Text>
-              <View className="ml-2 bg-emerald-400/20 border border-emerald-300/30 px-2 py-0.5 rounded-md">
-                <Text className="text-emerald-300 text-[10px] font-extrabold tracking-wider">
-                  DEBIT
+          // Compute displayed balance
+          let amountCentavos = card.balance_centavos;
+          if (isDebit && isDefault) {
+            amountCentavos = balanceCentavos;
+          } else if (!isDebit && card.credit_limit_centavos) {
+            amountCentavos = card.credit_limit_centavos;
+          }
+
+          const { symbol, formattedAmount } = splitCentavosToPhp(amountCentavos);
+          const isPositive = amountCentavos >= 0;
+          const displayBalance = isBalanceHidden
+            ? `${symbol} ••••••`
+            : `${isPositive ? '' : '-'}${symbol} ${formattedAmount}`;
+
+          return (
+            <Pressable
+              key={card.id}
+              onPress={handleCardPress}
+              style={{
+                width: cardWidth,
+                height: 180,
+                backgroundColor: card.color_primary,
+              }}
+              className="rounded-3xl p-5 justify-between overflow-hidden relative border border-white/20 shadow-xl"
+            >
+              {/* Subtle Ambient Background Circles */}
+              <View className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-white/10" />
+              <View className="absolute -bottom-16 -left-12 w-44 h-44 rounded-full bg-white/5" />
+
+              {/* Top Row: Bank Brand & Type Badge */}
+              <View className="flex-row items-center justify-between z-10">
+                <View className="flex-row items-center">
+                  <Text className="text-white font-extrabold text-base tracking-tight">
+                    {card.bank}
+                  </Text>
+                  <View className="ml-2 bg-white/20 border border-white/30 px-2 py-0.5 rounded-md">
+                    <Text className="text-white text-[10px] font-extrabold tracking-wider uppercase">
+                      {card.type}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Contactless waves icon */}
+                <View className="rotate-90">
+                  <Wifi size={16} color="#FFFFFF" />
+                </View>
+              </View>
+
+              {/* Middle Row: Chip & Balance/Limit */}
+              <View className="z-10 my-auto">
+                <View className="flex-row items-center justify-between mb-1">
+                  {/* Metallic Card Chip */}
+                  <View className="w-10 h-7 rounded-md bg-amber-400/90 border border-amber-300 justify-center p-1 shadow-sm">
+                    <View className="w-full h-[1px] bg-amber-600/70 mb-1" />
+                    <View className="w-full h-[1px] bg-amber-600/70" />
+                  </View>
+
+                  <Text className="text-white/80 text-[11px] font-medium">
+                    {isDebit ? 'Available Balance' : 'Credit Limit'}
+                  </Text>
+                </View>
+
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  className="text-white text-2xl font-black tracking-tight"
+                >
+                  {displayBalance}
                 </Text>
               </View>
-            </View>
 
-            {/* Contactless waves icon */}
-            <View className="rotate-90">
-              <Wifi size={16} color="#A7F3D0" />
-            </View>
-          </View>
+              {/* Bottom Row: Cardholder Name, Expiry & Masked Number */}
+              <View className="flex-row items-end justify-between z-10 border-t border-white/15 pt-2.5">
+                <View className="flex-1 mr-2">
+                  <Text numberOfLines={1} className="text-white font-bold text-xs tracking-wider">
+                    {(card.cardholder_name || displayName || 'KWARTA MEMBER').toUpperCase()}
+                  </Text>
+                  <Text className="text-white/90 text-[11px] font-mono tracking-widest mt-0.5">
+                    •••• {card.card_number_last4}
+                  </Text>
+                </View>
 
-          {/* Middle Row: Metallic Chip & Masked Number */}
-          <View className="z-10 my-auto">
-            <View className="flex-row items-center justify-between mb-2.5">
-              {/* Golden metallic card chip */}
-              <View className="w-10 h-7 rounded-md bg-amber-400/90 border border-amber-300/80 justify-center p-1 shadow-sm">
-                <View className="w-full h-[1px] bg-amber-600/70 mb-1" />
-                <View className="w-full h-[1px] bg-amber-600/70" />
+                <View className="items-end">
+                  <Text className="text-white/70 text-[9px] font-medium">
+                    {card.network.toUpperCase()}
+                  </Text>
+                  <Text className="text-white font-mono text-[11px] font-bold">
+                    {card.expiry_date}
+                  </Text>
+                </View>
               </View>
-
-              <Text className="text-emerald-200/90 text-[11px] font-medium tracking-wide">
-                Available Balance
-              </Text>
-            </View>
-
-            {/* Balance Amount */}
-            <Text
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              className="text-white text-2xl font-black tracking-tight"
-            >
-              {debitDisplay}
-            </Text>
-          </View>
-
-          {/* Bottom Row: Cardholder Name, Expiry & Masked Number */}
-          <View className="flex-row items-end justify-between z-10 border-t border-emerald-400/20 pt-2.5">
-            <View className="flex-1 mr-2">
-              <Text numberOfLines={1} className="text-emerald-100 font-bold text-xs tracking-wider">
-                {cardholderName}
-              </Text>
-              <Text className="text-emerald-300/80 text-[11px] font-mono tracking-widest mt-0.5">
-                •••• 4821
-              </Text>
-            </View>
-
-            <View className="items-end">
-              <Text className="text-emerald-300/70 text-[9px] font-medium">EXPIRES</Text>
-              <Text className="text-white font-mono text-[11px] font-bold">08/29</Text>
-            </View>
-          </View>
-        </Pressable>
-
-        {/* ================= CARD 2: CREDIT CARD ================= */}
-        <Pressable
-          onPress={handleCardPress}
-          style={{ width: cardWidth, height: 180 }}
-          className="rounded-3xl p-5 justify-between overflow-hidden relative border border-indigo-500/40 bg-[#1E1B4B] shadow-xl"
-        >
-          {/* Subtle Ambient Background Accents */}
-          <View className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-violet-400/15" />
-          <View className="absolute -bottom-16 -left-12 w-44 h-44 rounded-full bg-purple-500/10" />
-
-          {/* Top Row: Brand, Chip & Contactless */}
-          <View className="flex-row items-center justify-between z-10">
-            <View className="flex-row items-center">
-              <Text className="text-white font-extrabold text-base tracking-tight">
-                Kwarta
-              </Text>
-              <View className="ml-2 bg-indigo-400/25 border border-indigo-300/30 px-2 py-0.5 rounded-md">
-                <Text className="text-indigo-300 text-[10px] font-extrabold tracking-wider">
-                  CREDIT
-                </Text>
-              </View>
-            </View>
-
-            {/* Contactless waves icon */}
-            <View className="rotate-90">
-              <Wifi size={16} color="#C7D2FE" />
-            </View>
-          </View>
-
-          {/* Middle Row: Metallic Chip & Available Credit */}
-          <View className="z-10 my-auto">
-            <View className="flex-row items-center justify-between mb-2.5">
-              {/* Platinum metallic card chip */}
-              <View className="w-10 h-7 rounded-md bg-slate-300 border border-slate-200 justify-center p-1 shadow-sm">
-                <View className="w-full h-[1px] bg-slate-500/70 mb-1" />
-                <View className="w-full h-[1px] bg-slate-500/70" />
-              </View>
-
-              <Text className="text-indigo-200/90 text-[11px] font-medium tracking-wide">
-                Available Credit
-              </Text>
-            </View>
-
-            {/* Credit Amount */}
-            <Text
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              className="text-white text-2xl font-black tracking-tight"
-            >
-              {creditDisplay}
-            </Text>
-          </View>
-
-          {/* Bottom Row: Cardholder Name, Expiry & Masked Number */}
-          <View className="flex-row items-end justify-between z-10 border-t border-indigo-400/20 pt-2.5">
-            <View className="flex-1 mr-2">
-              <Text numberOfLines={1} className="text-indigo-100 font-bold text-xs tracking-wider">
-                {cardholderName}
-              </Text>
-              <Text className="text-indigo-300/80 text-[11px] font-mono tracking-widest mt-0.5">
-                •••• 8912
-              </Text>
-            </View>
-
-            <View className="items-end">
-              <Text className="text-indigo-300/70 text-[9px] font-medium">LIMIT</Text>
-              <Text className="text-white font-mono text-[11px] font-bold">₱50k</Text>
-            </View>
-          </View>
-        </Pressable>
+            </Pressable>
+          );
+        })}
       </ScrollView>
+
+      {/* Pagination Dots */}
+      {displayCards.length > 1 && (
+        <View className="flex-row justify-center items-center gap-1.5 mt-3">
+          {displayCards.map((c, i) => (
+            <View
+              key={c.id}
+              className={`h-1.5 rounded-full transition-all ${
+                activeIndex === i ? 'w-4 bg-emerald-400' : 'w-1.5 bg-slate-700'
+              }`}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
