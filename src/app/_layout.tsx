@@ -158,6 +158,15 @@ export default function RootLayout() {
             }}
           />
 
+          {/* Add Account Card Modal Screen */}
+          <Stack.Screen
+            name="accounts/add"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
+
           {/* Create Savings Goal Modal */}
           <Stack.Screen
             name="savings/create"

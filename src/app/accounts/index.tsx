@@ -16,21 +16,18 @@ import {
   Wifi,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { useAccountsStore, useAppStore, useSettingsStore } from '@/store';
-import { AccountCard, CreateAccountCardInput } from '@/types/accounts';
+import { useAccountsStore, useAppStore } from '@/store';
+import { AccountCard } from '@/types/accounts';
 import { splitCentavosToPhp } from '@/utils/currency';
 import { Button } from '@/components/ui/Button';
-import { AddCardModal } from '@/components/accounts/AddCardModal';
 import { DestructiveActionDialog } from '@/components/settings/DestructiveActionDialog';
 
 export default function ManageAccountsScreen() {
   const router = useRouter();
-  const { cards, addCard, removeCard, updateCardDetails } = useAccountsStore();
+  const { cards, removeCard, updateCardDetails } = useAccountsStore();
   const { transactions, isBalanceHidden } = useAppStore();
-  const { displayName } = useSettingsStore();
 
   const [activeFilter, setActiveFilter] = useState<'all' | 'debit' | 'credit'>('all');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cardToDelete, setCardToDelete] = useState<AccountCard | null>(null);
 
@@ -57,11 +54,7 @@ export default function ManageAccountsScreen() {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {}
-    setIsAddModalOpen(true);
-  };
-
-  const handleAddCardSubmit = async (input: CreateAccountCardInput) => {
-    await addCard(input);
+    router.push('/accounts/add' as any);
   };
 
   const handleSetDefault = async (card: AccountCard) => {
@@ -331,13 +324,6 @@ export default function ManageAccountsScreen() {
         </View>
       </ScrollView>
 
-      {/* Add Card Modal */}
-      <AddCardModal
-        visible={isAddModalOpen}
-        defaultCardholderName={displayName}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddCardSubmit}
-      />
 
       {/* Delete Card Confirmation Dialog */}
       <DestructiveActionDialog
