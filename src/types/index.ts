@@ -5,6 +5,7 @@
 export * from './finance';
 export * from './budget';
 export * from './analytics';
+export * from './savings';
 
 export interface Category {
   id: string | number;
@@ -13,18 +14,6 @@ export interface Category {
   color: string;
   type: 'income' | 'expense';
   is_default: number;
-  created_at: string;
-}
-
-export interface SavingsGoal {
-  id: string | number;
-  title: string;
-  target_amount: number; // Stored in integer centavos
-  current_amount: number; // Stored in integer centavos
-  target_date?: string;
-  color?: string;
-  icon?: string;
-  is_completed: number;
   created_at: string;
 }
 

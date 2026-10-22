@@ -19,6 +19,7 @@ import {
   getAllCategories,
 } from '@/database';
 import { useBudgetStore } from './useBudgetStore';
+import { useSavingsStore } from './useSavingsStore';
 
 interface FinanceState {
   // Database status
@@ -75,6 +76,7 @@ export const useAppStore = create<FinanceState>((set, get) => ({
       get().refreshCategories();
       get().refreshTransactions();
       useBudgetStore.getState().refreshBudgets();
+      useSavingsStore.getState().refreshSavings();
     }
   },
   dbError: null,
@@ -199,4 +201,4 @@ export const useAppStore = create<FinanceState>((set, get) => ({
 
 // Export alias for architectures looking for useFinanceStore
 export const useFinanceStore = useAppStore;
-export { useBudgetStore };
+export { useBudgetStore, useSavingsStore };

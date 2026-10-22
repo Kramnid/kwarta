@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, ScrollView, Switch } from 'react-native';
-import { Settings, Shield, Coins, Database, Moon, Sparkles } from 'lucide-react-native';
+import { View, Text, ScrollView, Switch, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Settings, Shield, Coins, Database, Moon, Sparkles, PiggyBank, ChevronRight } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { useAppStore } from '@/store';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { isDemoMode, toggleDemoMode, isDatabaseReady, dbError } = useAppStore();
 
   return (
@@ -23,6 +25,32 @@ export default function SettingsScreen() {
           Kwarta v1.0.0 • Every peso counts.
         </Text>
       </View>
+
+      {/* Savings Goals Navigation Entry */}
+      <Pressable
+        onPress={() => router.push('/savings' as any)}
+        className="active:opacity-80 mb-4"
+        accessibilityRole="button"
+        accessibilityLabel="Go to Savings Goals"
+      >
+        <Card className="border border-emerald-500/30">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center flex-1 mr-3">
+              <View className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center mr-3">
+                <PiggyBank size={20} color="#10B981" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-white text-sm font-bold">Savings Goals</Text>
+                <Text className="text-slate-400 text-xs mt-0.5">
+                  Track progress, targets, and milestones
+                </Text>
+              </View>
+            </View>
+
+            <ChevronRight size={18} color="#10B981" />
+          </View>
+        </Card>
+      </Pressable>
 
       {/* Demo Mode Toggle Card */}
       <Card className="mb-4">

@@ -21,8 +21,9 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   );
   const currentVersion = versionRow?.user_version ?? 0;
 
-  // Ensure budgets table matches modern schema (handles legacy prototype table from Step 1)
+  // Ensure budgets and savings tables match modern schema
   await ensureBudgetsSchema(db);
+  await ensureSavingsSchema(db);
 
   if (currentVersion >= CURRENT_SCHEMA_VERSION) {
     // Schema is up to date; ensure categories are seeded idempotently
@@ -30,7 +31,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
     return;
   }
 
-  // Version 0 -> 3 (Fresh database setup)
+  // Version 0 -> 4 (Fresh database setup)
   if (currentVersion === 0) {
     await db.withTransactionAsync(async () => {
       // 1. Create categories table
@@ -71,10 +72,13 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
       // 4. Ensure budgets table & indexes
       await ensureBudgetsSchema(db);
 
-      // 5. Seed default categories
+      // 5. Ensure savings goals and entries tables & indexes
+      await ensureSavingsSchema(db);
+
+      // 6. Seed default categories
       await seedDefaultCategories(db);
 
-      // 6. Update user_version
+      // 7. Update user_version
       await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
     });
     return;
@@ -180,12 +184,55 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   if (currentVersion < 3) {
     await db.withTransactionAsync(async () => {
       await ensureBudgetsSchema(db);
+      await db.execAsync(`PRAGMA user_version = 3;`);
+    });
+  }
+
+  // Version 3 -> 4 (Upgrade: Add savings_goals and savings_entries tables)
+  if (currentVersion < 4) {
+    await db.withTransactionAsync(async () => {
+      await ensureSavingsSchema(db);
       await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
     });
   }
 
   // Ensure categories are present
   await seedDefaultCategories(db);
+}
+
+/**
+ * Ensures the savings_goals and savings_entries tables exist and are properly indexed.
+ * Handles upgrading any legacy schema without dropping user data.
+ */
+export async function ensureSavingsSchema(db: SQLite.SQLiteDatabase): Promise<void> {
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS savings_goals (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      target_centavos INTEGER NOT NULL CHECK(target_centavos > 0),
+      deadline TEXT NULL,
+      icon TEXT NOT NULL,
+      color TEXT NOT NULL,
+      note TEXT NULL,
+      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'completed', 'archived')),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS savings_entries (
+      id TEXT PRIMARY KEY,
+      goal_id TEXT NOT NULL REFERENCES savings_goals(id) ON DELETE CASCADE,
+      type TEXT NOT NULL CHECK(type IN ('contribution', 'withdrawal')),
+      amount_centavos INTEGER NOT NULL CHECK(amount_centavos > 0),
+      note TEXT NULL,
+      entry_date TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_savings_entries_goal ON savings_entries(goal_id);
+    CREATE INDEX IF NOT EXISTS idx_savings_entries_date ON savings_entries(entry_date);
+    CREATE INDEX IF NOT EXISTS idx_savings_goals_status ON savings_goals(status);
+  `);
 }
 
 /**

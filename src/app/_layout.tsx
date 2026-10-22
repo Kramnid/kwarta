@@ -99,6 +99,40 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
+
+          {/* Savings Goals Main Screen */}
+          <Stack.Screen
+            name="savings/index"
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          {/* Create Savings Goal Modal */}
+          <Stack.Screen
+            name="savings/create"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
+
+          {/* Savings Goal Details Screen */}
+          <Stack.Screen
+            name="savings/[id]/index"
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          {/* Edit Savings Goal Modal */}
+          <Stack.Screen
+            name="savings/[id]/edit"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
         </Stack>
       </View>
     </ThemeProvider>

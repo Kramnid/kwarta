@@ -147,3 +147,32 @@ export function formatCompactCentavosToPhp(centavos: number): string {
   }
   return `₱${Math.round(pesos)}`;
 }
+
+/**
+ * Pure integer-safe conversion of a user input string to integer centavos.
+ * Avoids floating-point math completely.
+ */
+export function stringToCentavos(str: string): number {
+  const cleaned = str.replace(/[^0-9.]/g, '');
+  if (!cleaned) return 0;
+
+  const parts = cleaned.split('.');
+  const whole = parseInt(parts[0] || '0', 10);
+  let fraction = 0;
+
+  if (parts.length > 1) {
+    const fracStr = (parts[1] || '').substring(0, 2).padEnd(2, '0');
+    fraction = parseInt(fracStr, 10);
+  }
+
+  return (isNaN(whole) ? 0 : whole) * 100 + (isNaN(fraction) ? 0 : fraction);
+}
+
+/**
+ * Converts integer centavos to user editable string (e.g. 12550 -> "125.50").
+ */
+export function centavosToEditableString(centavos: number): string {
+  if (!centavos || centavos <= 0) return '';
+  const pesos = (centavos / 100).toFixed(2);
+  return pesos.endsWith('.00') ? String(Math.floor(centavos / 100)) : pesos;
+}

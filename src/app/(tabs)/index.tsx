@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useAppStore } from '@/store';
+import { useAppStore, useSavingsStore } from '@/store';
 import {
   calculateDashboardSummary,
   calculateSpendingByCategory,
@@ -16,6 +16,7 @@ import { BalanceCard } from '@/components/dashboard/BalanceCard';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { DashboardBudgetWidget } from '@/components/dashboard/DashboardBudgetWidget';
+import { DashboardSavingsWidget } from '@/components/dashboard/DashboardSavingsWidget';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
 import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 
@@ -55,7 +56,10 @@ export default function HomeScreen() {
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await refreshTransactions();
+      await Promise.all([
+        refreshTransactions(),
+        useSavingsStore.getState().refreshSavings(),
+      ]);
     } finally {
       setIsRefreshing(false);
     }
@@ -102,7 +106,10 @@ export default function HomeScreen() {
         {/* 5. Monthly Budget Widget (Compact overall monthly budget progress) */}
         <DashboardBudgetWidget className="mb-5" />
 
-        {/* 6. Recent Transactions (Placed prominently above monthly analytics) */}
+        {/* 6. Savings Goals Widget (Compact goal progress and view all link) */}
+        <DashboardSavingsWidget className="mb-5" />
+
+        {/* 7. Recent Transactions (Placed prominently above monthly analytics) */}
         <RecentTransactions
           transactions={recentTransactions}
           onTransactionPress={(tx) =>
