@@ -15,8 +15,8 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { BalanceCard } from '@/components/dashboard/BalanceCard';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
-import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
+import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -67,7 +67,7 @@ export default function HomeScreen() {
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingTop: 12,
-          paddingBottom: 36,
+          paddingBottom: 96,
         }}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -79,32 +79,26 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* 1. Dashboard Header (Greeting, Title, Avatar) */}
+        {/* 1. Dashboard Header (Greeting, Date, Avatar) */}
         <DashboardHeader />
 
-        {/* 2. Total Balance Card (Emerald Gradient, Balance in PHP) */}
+        {/* 2. Total Balance Card (Emerald Gradient, Balance with separate symbol) */}
         <BalanceCard
           balanceCentavos={summary.totalBalance}
-          className="mb-4"
+          className="mb-3.5"
         />
 
-        {/* 3. Income and Expense Summary (Side-by-side cards) */}
+        {/* 3. Income and Expense Summary (Side-by-side sleek cards) */}
         <SummaryCard
           incomeCentavos={summary.totalIncome}
           expenseCentavos={summary.totalExpenses}
-          className="mb-6"
+          className="mb-4"
         />
 
-        {/* 4. Quick Actions (Add Expense, Add Income, View History) */}
-        <QuickActions />
+        {/* 4. Quick Actions (Compact dock with Expense, Income, History) */}
+        <QuickActions className="mb-5" />
 
-        {/* 5. Spending Overview (Category Progress Bars for Current Month) */}
-        <SpendingOverview
-          categories={categoriesSpending}
-          totalExpensesCentavos={monthlyExpenses}
-        />
-
-        {/* 6. Recent Transactions (Tap to edit/view, or Empty State) */}
+        {/* 5. Recent Transactions (Placed prominently above monthly analytics) */}
         <RecentTransactions
           transactions={recentTransactions}
           onTransactionPress={(tx) =>
@@ -113,6 +107,13 @@ export default function HomeScreen() {
               params: { id: tx.id },
             } as any)
           }
+          className="mb-5"
+        />
+
+        {/* 6. Spending Overview (Category Progress Bars for Current Month) */}
+        <SpendingOverview
+          categories={categoriesSpending}
+          totalExpensesCentavos={monthlyExpenses}
         />
       </ScrollView>
     </SafeAreaView>

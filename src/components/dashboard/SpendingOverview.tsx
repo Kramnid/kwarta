@@ -47,7 +47,7 @@ export function SpendingOverview({
         onActionPress={handleViewInsights}
       />
 
-      <View className="bg-[#151F30] rounded-3xl p-5 border border-slate-700/60 shadow-sm">
+      <View className="bg-[#151F30] rounded-2xl p-4 border border-slate-700/60 shadow-sm">
         {/* Top Summary Row: Month & Total Spending */}
         <View className="flex-row items-center justify-between pb-4 mb-4 border-b border-slate-700/60">
           <View>

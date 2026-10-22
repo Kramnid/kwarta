@@ -26,7 +26,7 @@ export const CURRENCY_LOCALE = 'en-PH';
  */
 export function formatPhp(amountInPesos: number): string {
   if (isNaN(amountInPesos) || !isFinite(amountInPesos)) {
-    return `${CURRENCY_SYMBOL}0.00`;
+    return `${CURRENCY_SYMBOL} 0.00`;
   }
 
   const isNegative = amountInPesos < 0;
@@ -38,7 +38,7 @@ export function formatPhp(amountInPesos: number): string {
     maximumFractionDigits: 2,
   });
 
-  return `${isNegative ? '-' : ''}${CURRENCY_SYMBOL}${formattedNumber}`;
+  return `${isNegative ? '-' : ''}${CURRENCY_SYMBOL} ${formattedNumber}`;
 }
 
 /**
@@ -46,21 +46,45 @@ export function formatPhp(amountInPesos: number): string {
  * Used when reading raw monetary amounts from the SQLite database.
  *
  * Examples:
- *  1250000  → "₱12,500.00"
- *  150050   → "₱1,500.50"
- *  -25000   → "-₱250.00"
- *  0        → "₱0.00"
+ *  1250000  → "₱ 12,500.00"
+ *  150050   → "₱ 1,500.50"
+ *  -25000   → "-₱ 250.00"
+ *  0        → "₱ 0.00"
  *
  * @param centavos Amount in integer centavos (e.g. 1250000 for ₱12,500.00)
  * @returns Formatted currency string
  */
 export function formatCentavosToPhp(centavos: number): string {
   if (isNaN(centavos) || !isFinite(centavos)) {
-    return `${CURRENCY_SYMBOL}0.00`;
+    return `${CURRENCY_SYMBOL} 0.00`;
   }
 
   const pesos = centavos / 100;
   return formatPhp(pesos);
+}
+
+/**
+ * Splits integer centavos into separate currency symbol and numeric strings.
+ * Ideal for high-end fintech balance displays where symbol and amount are styled distinctly.
+ */
+export function splitCentavosToPhp(centavos: number): {
+  symbol: string;
+  formattedAmount: string;
+  isNegative: boolean;
+} {
+  const isNegative = centavos < 0;
+  const absCentavos = Math.abs(centavos || 0);
+  const pesos = absCentavos / 100;
+  const formattedAmount = pesos.toLocaleString(CURRENCY_LOCALE, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  return {
+    symbol: CURRENCY_SYMBOL,
+    formattedAmount,
+    isNegative,
+  };
 }
 
 /**

@@ -32,14 +32,14 @@ export function RecentTransactions({
   const displayTransactions = transactions.slice(0, 5);
 
   return (
-    <View className={`mb-8 ${className}`}>
+    <View className={`mb-6 ${className}`}>
       <SectionHeader
         title="Recent Transactions"
         actionText="See All →"
         onActionPress={handleSeeAll}
       />
 
-      <View className="bg-[#151F30] rounded-3xl p-3 border border-slate-700/60 shadow-sm">
+      <View className="bg-[#151F30] rounded-2xl p-2 border border-slate-700/60 shadow-sm">
         {displayTransactions.length === 0 ? (
           /* Empty State */
           <View className="py-8 px-4 items-center justify-center">
