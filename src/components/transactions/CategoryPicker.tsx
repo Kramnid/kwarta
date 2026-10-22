@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, LayoutAnimation, Platform, UIManager } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+} from 'react-native';
 import { ChevronDown, ChevronUp, Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { TransactionCategory, TransactionType } from '@/types/finance';
@@ -56,7 +64,7 @@ export function CategoryPicker({
     }
 
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {}
     onSelect(categoryId);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -71,30 +79,18 @@ export function CategoryPicker({
           {label}
         </Text>
         {selectedCategory && (
-          <View className="flex-row items-center">
-            <View
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: selectedCategory.color,
-                marginRight: 6,
-              }}
-            />
-            <Text
-              style={{ color: selectedCategory.color, fontSize: 12, fontWeight: '700' }}
-            >
-              {selectedCategory.name}
-            </Text>
-          </View>
+          <Text style={{ color: selectedCategory.color, fontSize: 11, fontWeight: '700' }}>
+            {selectedCategory.name}
+          </Text>
         )}
       </View>
 
-      {/* Dropdown Trigger */}
+      {/* Dropdown Input Trigger */}
       <Pressable
         onPress={toggleDropdown}
-        accessibilityRole="button"
-        accessibilityLabel="Category dropdown"
+        accessibilityRole="combobox"
+        accessibilityLabel={`${label} dropdown`}
+        aria-expanded={isOpen}
         style={{
           backgroundColor: '#151F30',
           borderRadius: isOpen ? 16 : 18,
@@ -117,9 +113,9 @@ export function CategoryPicker({
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
             <View
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 12,
+                width: 34,
+                height: 34,
+                borderRadius: 10,
                 backgroundColor: `${selectedCategory.color}25`,
                 borderWidth: 1,
                 borderColor: `${selectedCategory.color}50`,
@@ -128,14 +124,14 @@ export function CategoryPicker({
                 marginRight: 12,
               }}
             >
-              <CategoryIcon name={selectedCategory.icon} color={selectedCategory.color} size={20} />
+              <CategoryIcon name={selectedCategory.icon} color={selectedCategory.color} size={18} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }} numberOfLines={1}>
                 {selectedCategory.name}
               </Text>
               <Text style={{ color: '#94A3B8', fontSize: 11, fontWeight: '500' }}>
-                Tap to change category
+                Tap to change
               </Text>
             </View>
           </View>
@@ -143,9 +139,9 @@ export function CategoryPicker({
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
             <View
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 12,
+                width: 34,
+                height: 34,
+                borderRadius: 10,
                 backgroundColor: '#1E293B',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -155,16 +151,17 @@ export function CategoryPicker({
               <Text style={{ color: '#94A3B8', fontSize: 16 }}>?</Text>
             </View>
             <Text style={{ color: '#94A3B8', fontSize: 15, fontWeight: '600' }}>
-              Select a Category
+              Select a category...
             </Text>
           </View>
         )}
 
+        {/* Dropdown Chevron */}
         <View
           style={{
-            width: 32,
-            height: 32,
-            borderRadius: 10,
+            width: 30,
+            height: 30,
+            borderRadius: 8,
             backgroundColor: isOpen ? 'rgba(16, 185, 129, 0.15)' : '#1E293B',
             alignItems: 'center',
             justifyContent: 'center',
@@ -173,14 +170,14 @@ export function CategoryPicker({
           }}
         >
           {isOpen ? (
-            <ChevronUp size={18} color="#10B981" />
+            <ChevronUp size={16} color="#10B981" />
           ) : (
-            <ChevronDown size={18} color="#94A3B8" />
+            <ChevronDown size={16} color="#94A3B8" />
           )}
         </View>
       </Pressable>
 
-      {/* Dropdown Options (Revealed on Open) */}
+      {/* Dropdown List Menu (Revealed on Open) */}
       {isOpen && (
         <View
           style={{
@@ -190,112 +187,107 @@ export function CategoryPicker({
             borderWidth: 1.5,
             borderTopWidth: 0,
             borderColor: '#10B981',
-            padding: 14,
-            paddingTop: 8,
+            maxHeight: 260,
+            overflow: 'hidden',
           }}
         >
-          <View
-            style={{
-              height: 1,
-              backgroundColor: 'rgba(51, 65, 85, 0.6)',
-              marginBottom: 12,
-            }}
-          />
-
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {availableCategories.map((cat) => {
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={{ paddingVertical: 4 }}
+          >
+            {availableCategories.map((cat, index) => {
               const isSelected = cat.id === selectedCategoryId;
               const isDisabled = !!disabledCategoryIds?.has(cat.id);
+              const isLast = index === availableCategories.length - 1;
 
               return (
                 <Pressable
                   key={cat.id}
                   onPress={() => handleSelect(cat.id, isDisabled)}
-                  accessibilityRole="button"
+                  accessibilityRole="menuitem"
                   accessibilityLabel={cat.name}
-                  style={{
-                    width: '31%',
-                    marginBottom: 10,
-                    paddingVertical: 10,
-                    paddingHorizontal: 6,
-                    borderRadius: 14,
+                  style={({ pressed }) => ({
+                    flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
                     backgroundColor: isSelected
-                      ? `${cat.color}25`
-                      : isDisabled
-                      ? '#0F172A'
-                      : '#1E293B',
-                    borderWidth: 1.5,
-                    borderColor: isSelected
-                      ? cat.color
-                      : isDisabled
+                      ? 'rgba(16, 185, 129, 0.12)'
+                      : pressed
                       ? '#1E293B'
-                      : 'rgba(51, 65, 85, 0.6)',
-                    opacity: isDisabled ? 0.4 : 1,
-                    position: 'relative',
-                  }}
+                      : 'transparent',
+                    borderBottomWidth: isLast ? 0 : 1,
+                    borderBottomColor: 'rgba(51, 65, 85, 0.35)',
+                    opacity: isDisabled ? 0.45 : 1,
+                  })}
                 >
+                  {/* Left: Icon + Name */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 12 }}>
+                    <View
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 10,
+                        backgroundColor: `${cat.color}20`,
+                        borderWidth: 1,
+                        borderColor: `${cat.color}40`,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 12,
+                      }}
+                    >
+                      <CategoryIcon name={cat.icon} color={cat.color} size={17} />
+                    </View>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: isSelected ? '800' : '600',
+                        color: isSelected ? '#10B981' : '#F1F5F9',
+                      }}
+                    >
+                      {cat.name}
+                    </Text>
+                  </View>
+
+                  {/* Right: Checkmark or Disabled Badge */}
                   {isSelected && (
                     <View
                       style={{
-                        position: 'absolute',
-                        top: 4,
-                        right: 4,
-                        width: 16,
-                        height: 16,
-                        borderRadius: 8,
-                        backgroundColor: cat.color,
+                        width: 22,
+                        height: 22,
+                        borderRadius: 11,
+                        backgroundColor: '#10B981',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <Check size={10} color="#0B1220" strokeWidth={3} />
+                      <Check size={13} color="#0B1220" strokeWidth={3} />
                     </View>
                   )}
 
-                  <View
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 11,
-                      backgroundColor: `${cat.color}15`,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: 6,
-                    }}
-                  >
-                    <CategoryIcon name={cat.icon} color={cat.color} size={18} />
-                  </View>
-
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      fontSize: 11,
-                      fontWeight: isSelected ? '800' : '600',
-                      color: isSelected ? '#FFFFFF' : '#CBD5E1',
-                      textAlign: 'center',
-                    }}
-                  >
-                    {cat.name}
-                  </Text>
-
                   {isDisabled && (
-                    <Text
+                    <View
                       style={{
-                        fontSize: 9,
-                        fontWeight: '700',
-                        color: '#94A3B8',
-                        marginTop: 2,
+                        backgroundColor: '#1E293B',
+                        paddingHorizontal: 8,
+                        paddingVertical: 3,
+                        borderRadius: 6,
+                        borderWidth: 1,
+                        borderColor: '#334155',
                       }}
                     >
-                      Budgeted
-                    </Text>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: '#94A3B8' }}>
+                        Budgeted
+                      </Text>
+                    </View>
                   )}
                 </Pressable>
               );
             })}
-          </View>
+          </ScrollView>
         </View>
       )}
 
