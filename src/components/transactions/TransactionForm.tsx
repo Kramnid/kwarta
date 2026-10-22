@@ -97,7 +97,7 @@ export function TransactionForm({
       await onSubmit(inputData);
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      Alert.alert('Save Failed', msg || 'Could not save transaction to SQLite.');
+      Alert.alert('Save Failed', msg || 'Could not save transaction. Please try again.');
     }
   };
 

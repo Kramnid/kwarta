@@ -52,7 +52,7 @@ export function validateTransactionInput(
     if (!matchingCategory) {
       errors.category = 'Selected category does not exist.';
     } else if (input.type && matchingCategory.type !== input.type) {
-      errors.category = `Selected category does not match transaction type (${input.type}).`;
+      errors.category = `Please choose a valid ${input.type} category.`;
     }
   }
 
@@ -62,7 +62,7 @@ export function validateTransactionInput(
   } else {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(input.transaction_date)) {
-      errors.date = 'Invalid date format (must be YYYY-MM-DD).';
+      errors.date = 'Please select a valid date.';
     } else {
       const parsed = new Date(input.transaction_date);
       if (isNaN(parsed.getTime())) {

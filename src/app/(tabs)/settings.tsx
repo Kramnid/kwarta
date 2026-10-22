@@ -18,7 +18,7 @@ export default function SettingsScreen() {
           <Settings size={30} color="#10B981" />
         </View>
 
-        <Text className="text-white text-xl font-bold">Settings & System Info</Text>
+        <Text className="text-white text-xl font-bold">Settings & Preferences</Text>
         <Text className="text-slate-400 text-xs mt-1">
           Kwarta v1.0.0 • Every peso counts.
         </Text>
@@ -32,9 +32,9 @@ export default function SettingsScreen() {
               <Sparkles size={18} color="#10B981" />
             </View>
             <View className="flex-1">
-              <Text className="text-white text-sm font-semibold">Demo Mode</Text>
+              <Text className="text-white text-sm font-semibold">Sample Data</Text>
               <Text className="text-slate-400 text-xs mt-0.5">
-                Display sample data for preview and design testing
+                Show example transactions to explore features
               </Text>
             </View>
           </View>
@@ -51,7 +51,7 @@ export default function SettingsScreen() {
       {/* App Configuration Overview */}
       <Card className="mb-4">
         <Text className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-4">
-          Core Configuration
+          Preferences & Storage
         </Text>
 
         <View className="gap-4">
@@ -66,10 +66,10 @@ export default function SettingsScreen() {
           <View className="flex-row items-center justify-between pb-3 border-b border-slate-700/50">
             <View className="flex-row items-center">
               <Database size={18} color="#10B981" />
-              <Text className="text-slate-200 text-sm font-medium ml-3">Database</Text>
+              <Text className="text-slate-200 text-sm font-medium ml-3">Storage</Text>
             </View>
             <Text className="text-slate-400 text-sm">
-              {isDatabaseReady ? 'SQLite (WAL Mode)' : dbError ? 'DB Error' : 'Initializing...'}
+              {isDatabaseReady ? 'Saved on Device' : dbError ? 'Unavailable' : 'Connecting...'}
             </Text>
           </View>
 
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
               <Moon size={18} color="#10B981" />
               <Text className="text-slate-200 text-sm font-medium ml-3">Theme</Text>
             </View>
-            <Text className="text-slate-400 text-sm">Fintech Dark</Text>
+            <Text className="text-slate-400 text-sm">Dark Mode</Text>
           </View>
 
           <View className="flex-row items-center justify-between">

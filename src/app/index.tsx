@@ -85,7 +85,7 @@ export default function WelcomeScreen() {
                   </Text>
                 </View>
                 <Text className="text-xs text-emerald-400 font-semibold">
-                  SQLite Encrypted
+                  Saved on Device
                 </Text>
               </View>
             </View>

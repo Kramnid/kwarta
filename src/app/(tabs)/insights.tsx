@@ -147,7 +147,7 @@ export default function InsightsScreen() {
           </Text>
         </View>
         <Text className="text-slate-400 text-xs leading-5">
-          Detailed monthly trend charts, category donut diagrams, and budget progress targets will expand this analytics screen in upcoming feature steps.
+          Detailed monthly trend charts, category breakdowns, and custom budget limits are coming in future updates.
         </Text>
       </Card>
     </ScrollView>

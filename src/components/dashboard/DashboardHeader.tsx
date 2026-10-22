@@ -47,18 +47,18 @@ export function DashboardHeader({
             {userName ? `, ${userName}` : ''}
           </Text>
 
-          {/* Demo Mode Badge */}
+          {/* Sample Preview Badge */}
           {isDemoMode && (
             <Pressable
               onPress={handleDemoPillPress}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
               className="ml-2.5 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex-row items-center active:opacity-70"
               accessibilityRole="button"
-              accessibilityLabel="Demo mode active, tap to toggle"
+              accessibilityLabel="Sample data active, tap to switch"
             >
               <Sparkles size={10} color="#10B981" />
               <Text className="text-emerald-400 text-[10px] font-bold tracking-wide ml-1">
-                DEMO
+                SAMPLE
               </Text>
             </Pressable>
           )}
