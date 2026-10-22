@@ -5,20 +5,14 @@ import { useRouter } from 'expo-router';
 import { useAppStore, useSavingsStore, useSettingsStore } from '@/store';
 import {
   calculateDashboardSummary,
-  calculateSpendingByCategory,
-  calculateTotalExpenses,
   getRecentTransactions,
-  getEffectiveDate,
 } from '@/utils/finance';
-import { isDateInThisMonth } from '@/utils/date';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { BalanceCard } from '@/components/dashboard/BalanceCard';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
-import { DashboardBudgetWidget } from '@/components/dashboard/DashboardBudgetWidget';
 import { DashboardSavingsWidget } from '@/components/dashboard/DashboardSavingsWidget';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
-import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -30,22 +24,6 @@ export default function HomeScreen() {
   const summary = useMemo(
     () => calculateDashboardSummary(transactions),
     [transactions]
-  );
-
-  // Current calendar month spending overview
-  const currentMonthTransactions = useMemo(
-    () => transactions.filter((t) => isDateInThisMonth(getEffectiveDate(t))),
-    [transactions]
-  );
-
-  const monthlyExpenses = useMemo(
-    () => calculateTotalExpenses(currentMonthTransactions),
-    [currentMonthTransactions]
-  );
-
-  const categoriesSpending = useMemo(
-    () => calculateSpendingByCategory(currentMonthTransactions),
-    [currentMonthTransactions]
   );
 
   // 5 newest transactions
@@ -104,13 +82,10 @@ export default function HomeScreen() {
         {/* 4. Quick Actions (Compact dock with Expense, Income, History) */}
         <QuickActions className="mb-5" />
 
-        {/* 5. Monthly Budget Widget (Compact overall monthly budget progress) */}
-        <DashboardBudgetWidget className="mb-5" />
-
-        {/* 6. Savings Goals Widget (Compact goal progress and view all link) */}
+        {/* 5. Savings Goals Widget (Compact goal progress and view all link) */}
         <DashboardSavingsWidget className="mb-5" />
 
-        {/* 7. Recent Transactions (Placed prominently above monthly analytics) */}
+        {/* 6. Recent Transactions */}
         <RecentTransactions
           transactions={recentTransactions}
           onTransactionPress={(tx) =>
@@ -120,12 +95,6 @@ export default function HomeScreen() {
             } as any)
           }
           className="mb-5"
-        />
-
-        {/* 6. Spending Overview (Category Progress Bars for Current Month) */}
-        <SpendingOverview
-          categories={categoriesSpending}
-          totalExpensesCentavos={monthlyExpenses}
         />
       </ScrollView>
     </SafeAreaView>
