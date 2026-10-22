@@ -6,7 +6,7 @@
 import { TransactionCategory } from '@/types/finance';
 
 export const DATABASE_NAME = 'kwarta.db';
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export const DEFAULT_CATEGORIES: TransactionCategory[] = [
   // Expense Categories

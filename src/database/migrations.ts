@@ -27,7 +27,7 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
     return;
   }
 
-  // Version 0 -> 2 (Fresh database setup)
+  // Version 0 -> 3 (Fresh database setup)
   if (currentVersion === 0) {
     await db.withTransactionAsync(async () => {
       // 1. Create categories table
@@ -58,17 +58,34 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
         );
       `);
 
-      // 3. Create indexes for performance
+      // 3. Create budgets table (Step 4)
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS budgets (
+          id TEXT PRIMARY KEY,
+          category_id TEXT NULL REFERENCES categories(id) ON DELETE CASCADE,
+          amount_centavos INTEGER NOT NULL CHECK(amount_centavos > 0),
+          month TEXT NOT NULL CHECK(length(month) = 7),
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+      `);
+
+      // 4. Create indexes for performance and constraints
       await db.execAsync(`
         CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(transaction_date);
         CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);
         CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
+
+        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_overall_month ON budgets(month) WHERE category_id IS NULL;
+        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_category_month ON budgets(category_id, month) WHERE category_id IS NOT NULL;
+        CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month);
+        CREATE INDEX IF NOT EXISTS idx_budgets_category ON budgets(category_id);
       `);
 
-      // 4. Seed default categories
+      // 5. Seed default categories
       await seedDefaultCategories(db);
 
-      // 5. Update user_version
+      // 6. Update user_version
       await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
     });
     return;
@@ -165,10 +182,36 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
         CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);
         CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
 
+        PRAGMA user_version = 2;
+      `);
+    });
+  }
+
+  // Version 2 -> 3 (Upgrade: Add budgets table and unique indexes)
+  if (currentVersion < 3) {
+    await db.withTransactionAsync(async () => {
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS budgets (
+          id TEXT PRIMARY KEY,
+          category_id TEXT NULL REFERENCES categories(id) ON DELETE CASCADE,
+          amount_centavos INTEGER NOT NULL CHECK(amount_centavos > 0),
+          month TEXT NOT NULL CHECK(length(month) = 7),
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+
+        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_overall_month ON budgets(month) WHERE category_id IS NULL;
+        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_category_month ON budgets(category_id, month) WHERE category_id IS NOT NULL;
+        CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month);
+        CREATE INDEX IF NOT EXISTS idx_budgets_category ON budgets(category_id);
+
         PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};
       `);
     });
   }
+
+  // Ensure categories are present
+  await seedDefaultCategories(db);
 }
 
 /**

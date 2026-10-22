@@ -36,3 +36,4 @@ export * from './schema';
 export * from './migrations';
 export * from './categories';
 export * from './transactions';
+export * from './budgets';

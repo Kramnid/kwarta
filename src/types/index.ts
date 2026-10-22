@@ -3,6 +3,7 @@
  */
 
 export * from './finance';
+export * from './budget';
 
 export interface Category {
   id: string | number;
@@ -11,16 +12,6 @@ export interface Category {
   color: string;
   type: 'income' | 'expense';
   is_default: number;
-  created_at: string;
-}
-
-export interface Budget {
-  id: string | number;
-  category_id: string | number;
-  amount_limit: number; // Stored in integer centavos
-  period: 'weekly' | 'monthly' | 'yearly';
-  start_date: string;
-  end_date?: string;
   created_at: string;
 }
 

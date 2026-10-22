@@ -81,6 +81,24 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
+
+          {/* Add Budget Modal */}
+          <Stack.Screen
+            name="add-budget"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
+
+          {/* Edit Budget Modal */}
+          <Stack.Screen
+            name="budget/[id]"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
         </Stack>
       </View>
     </ThemeProvider>

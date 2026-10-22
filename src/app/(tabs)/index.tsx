@@ -15,6 +15,7 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { BalanceCard } from '@/components/dashboard/BalanceCard';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
+import { DashboardBudgetWidget } from '@/components/dashboard/DashboardBudgetWidget';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
 import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 
@@ -98,7 +99,10 @@ export default function HomeScreen() {
         {/* 4. Quick Actions (Compact dock with Expense, Income, History) */}
         <QuickActions className="mb-5" />
 
-        {/* 5. Recent Transactions (Placed prominently above monthly analytics) */}
+        {/* 5. Monthly Budget Widget (Compact overall monthly budget progress) */}
+        <DashboardBudgetWidget className="mb-5" />
+
+        {/* 6. Recent Transactions (Placed prominently above monthly analytics) */}
         <RecentTransactions
           transactions={recentTransactions}
           onTransactionPress={(tx) =>

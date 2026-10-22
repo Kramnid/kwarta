@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import {
   House,
   ArrowLeftRight,
+  WalletCards,
   ChartNoAxesCombined,
   Settings,
 } from 'lucide-react-native';
@@ -58,6 +59,16 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <ArrowLeftRight size={size ?? 22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="budgets"
+        options={{
+          title: 'Budgets',
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <WalletCards size={size ?? 22} color={color} />
           ),
         }}
       />

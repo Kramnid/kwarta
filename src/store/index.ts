@@ -18,6 +18,7 @@ import {
   deleteTransaction as dbDeleteTransaction,
   getAllCategories,
 } from '@/database';
+import { useBudgetStore } from './useBudgetStore';
 
 interface FinanceState {
   // Database status
@@ -73,6 +74,7 @@ export const useAppStore = create<FinanceState>((set, get) => ({
     if (ready) {
       get().refreshCategories();
       get().refreshTransactions();
+      useBudgetStore.getState().refreshBudgets();
     }
   },
   dbError: null,
@@ -83,11 +85,13 @@ export const useAppStore = create<FinanceState>((set, get) => ({
   setDemoMode: (enabled: boolean) => {
     set({ isDemoMode: enabled });
     get().refreshTransactions();
+    useBudgetStore.getState().refreshBudgets();
   },
   toggleDemoMode: () => {
     const next = !get().isDemoMode;
     set({ isDemoMode: next });
     get().refreshTransactions();
+    useBudgetStore.getState().refreshBudgets();
   },
 
   transactions: [],
@@ -158,6 +162,8 @@ export const useAppStore = create<FinanceState>((set, get) => ({
     const created = await insertTransaction(input);
     // Refresh the in-memory state so dashboard and all screens react immediately
     await get().refreshTransactions();
+    // Refresh budgets so budget progress updates immediately
+    await useBudgetStore.getState().refreshBudgets();
     return created;
   },
 
@@ -172,6 +178,7 @@ export const useAppStore = create<FinanceState>((set, get) => ({
 
     const updated = await dbUpdateTransaction(id, input);
     await get().refreshTransactions();
+    await useBudgetStore.getState().refreshBudgets();
     return updated;
   },
 
@@ -184,6 +191,7 @@ export const useAppStore = create<FinanceState>((set, get) => ({
     const success = await dbDeleteTransaction(id);
     if (success) {
       await get().refreshTransactions();
+      await useBudgetStore.getState().refreshBudgets();
     }
     return success;
   },
@@ -191,3 +199,4 @@ export const useAppStore = create<FinanceState>((set, get) => ({
 
 // Export alias for architectures looking for useFinanceStore
 export const useFinanceStore = useAppStore;
+export { useBudgetStore };
