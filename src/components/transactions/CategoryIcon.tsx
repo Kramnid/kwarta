@@ -102,3 +102,6 @@ export function CategoryIcon({
       return <Tag size={size} color={color} />;
   }
 }
+
+export default CategoryIcon;
+

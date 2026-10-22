@@ -19,15 +19,15 @@ import {
 } from '@/utils/date';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { TransactionTypeSelector } from './TransactionTypeSelector';
+import { TransactionTypeSelector } from '@/components/transactions/TransactionTypeSelector';
 import {
   AmountInput,
   stringToCentavos,
   centavosToEditableString,
-} from './AmountInput';
-import { CategoryPicker } from './CategoryPicker';
-import { DatePickerModal } from './DatePickerModal';
-import { DeleteConfirmModal } from './DeleteConfirmModal';
+} from '@/components/transactions/AmountInput';
+import { CategoryPicker } from '@/components/transactions/CategoryPicker';
+import { DatePickerModal } from '@/components/transactions/DatePickerModal';
+import { DeleteConfirmModal } from '@/components/transactions/DeleteConfirmModal';
 
 interface TransactionFormProps {
   initialData?: Partial<CreateTransactionInput> & { id?: string };
@@ -456,3 +456,6 @@ export function TransactionForm({
     </View>
   );
 }
+
+export default TransactionForm;
+
