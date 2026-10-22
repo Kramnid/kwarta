@@ -4,8 +4,8 @@ import {
   Text,
   Modal,
   Pressable,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Card } from '@/components/ui/Card';
