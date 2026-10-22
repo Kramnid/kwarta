@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { ShieldCheck, TrendingUp, TrendingDown, Eye, EyeOff } from 'lucide-react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { splitCentavosToPhp } from '@/utils/currency';
 import { useAppStore } from '@/store';
@@ -40,14 +40,13 @@ export function BalanceCard({
 
       {/* Main card body with guaranteed style padding for 100% cross-platform reliability */}
       <View
-        className="p-5"
         style={{
           paddingHorizontal: 20,
-          paddingVertical: 20,
+          paddingVertical: 18,
         }}
       >
         {/* Top Header Row: Label & Privacy Eye Toggle */}
-        <View className="flex-row items-center justify-between mb-3">
+        <View className="flex-row items-center justify-between mb-2">
           <View className="flex-row items-center">
             <View className="w-2.5 h-2.5 rounded-full bg-emerald-400 mr-2 shadow-sm shadow-emerald-400" />
             <Text className="text-slate-300 text-xs font-bold tracking-wider uppercase">
@@ -75,7 +74,7 @@ export function BalanceCard({
         </View>
 
         {/* Main Balance Display: High Contrast Crisp White Text */}
-        <View className="my-2">
+        <View className="mt-1">
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
@@ -86,28 +85,9 @@ export function BalanceCard({
             {displayAmount}
           </Text>
         </View>
-
-        {/* Bottom Row: Cash status & Privacy badge with crisp readable colors */}
-        <View className="flex-row items-center justify-between pt-3.5 border-t border-slate-700/80 mt-1">
-          <View className="flex-row items-center">
-            {isPositive ? (
-              <TrendingUp size={15} color="#34D399" />
-            ) : (
-              <TrendingDown size={15} color="#F87171" />
-            )}
-            <Text className="text-slate-200 text-xs font-medium ml-1.5">
-              {isPositive ? 'Available cash balance' : 'Deficit balance'}
-            </Text>
-          </View>
-
-          <View className="flex-row items-center bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-            <ShieldCheck size={13} color="#34D399" />
-            <Text className="text-emerald-300 text-[11px] font-semibold ml-1">
-              Private & Safe
-            </Text>
-          </View>
-        </View>
       </View>
     </View>
   );
 }
+
+export default BalanceCard;
