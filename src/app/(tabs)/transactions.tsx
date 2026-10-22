@@ -1,50 +1,64 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeftRight, Plus, Receipt } from 'lucide-react-native';
-import { Card } from '@/components/ui/Card';
+import { Plus, Receipt } from 'lucide-react-native';
+import { useAppStore } from '@/store';
+import { sortTransactionsByDate } from '@/utils/finance';
+import { TransactionItem } from '@/components/dashboard/TransactionItem';
 import { Button } from '@/components/ui/Button';
 
 export default function TransactionsScreen() {
   const router = useRouter();
+  const { transactions } = useAppStore();
+  const sortedTransactions = sortTransactionsByDate(transactions);
 
   return (
     <ScrollView
       className="flex-1 bg-[#0B1220]"
-      contentContainerStyle={{ padding: 20 }}
+      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
       showsVerticalScrollIndicator={false}
     >
-      <View className="items-center py-8">
-        <View className="w-16 h-16 rounded-3xl bg-slate-800 items-center justify-center border border-slate-700/80 mb-4">
-          <Receipt size={32} color="#10B981" />
-        </View>
-
-        <Text className="text-white text-xl font-bold text-center">
-          Transactions History
-        </Text>
-        <Text className="text-slate-400 text-sm text-center mt-2 px-6 leading-5">
-          View, search, and filter your incoming salary and daily expenses.
-        </Text>
-      </View>
-
-      <Card className="mb-6">
-        <View className="flex-row items-center mb-3">
-          <ArrowLeftRight size={18} color="#10B981" />
-          <Text className="text-white font-semibold text-base ml-2">
-            Step 1 Placeholder
+      {/* Top Banner */}
+      <View className="flex-row items-center justify-between mb-5">
+        <View>
+          <Text className="text-white text-xl font-bold">All Transactions</Text>
+          <Text className="text-slate-400 text-xs mt-0.5">
+            {sortedTransactions.length} recorded {sortedTransactions.length === 1 ? 'transaction' : 'transactions'}
           </Text>
         </View>
-        <Text className="text-slate-400 text-xs leading-5">
-          The SQLite schema for <Text className="text-emerald-400">transactions</Text> and{' '}
-          <Text className="text-emerald-400">categories</Text> is prepared and seeded. Full transaction CRUD, filtering by date, and category tags will be integrated in subsequent steps.
-        </Text>
-      </Card>
 
-      <Button
-        title="Record New Transaction"
-        onPress={() => router.push('/add-transaction')}
-        leftIcon={<Plus size={18} color="#FFFFFF" />}
-      />
+        <Button
+          title="New"
+          size="sm"
+          onPress={() => router.push('/add-transaction')}
+          leftIcon={<Plus size={16} color="#FFFFFF" />}
+        />
+      </View>
+
+      {/* Transactions List */}
+      <View className="bg-[#151F30] rounded-3xl p-3 border border-slate-700/60 shadow-sm mb-6">
+        {sortedTransactions.length === 0 ? (
+          <View className="py-12 items-center justify-center">
+            <View className="w-14 h-14 rounded-2xl bg-slate-800 items-center justify-center mb-3">
+              <Receipt size={28} color="#94A3B8" />
+            </View>
+            <Text className="text-white text-base font-bold text-center">
+              No transactions yet
+            </Text>
+            <Text className="text-slate-400 text-xs text-center mt-1">
+              Start tracking by adding your first transaction.
+            </Text>
+          </View>
+        ) : (
+          sortedTransactions.map((tx, index) => (
+            <TransactionItem
+              key={`tx-history-${tx.id}-${index}`}
+              transaction={tx}
+              showDivider={index < sortedTransactions.length - 1}
+            />
+          ))
+        )}
+      </View>
     </ScrollView>
   );
 }

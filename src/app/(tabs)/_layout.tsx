@@ -2,9 +2,9 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 import {
-  LayoutDashboard,
+  House,
   ArrowLeftRight,
-  PieChart,
+  ChartNoAxesCombined,
   Settings,
 } from 'lucide-react-native';
 
@@ -44,9 +44,9 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerTitle: 'Kwarta',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <LayoutDashboard size={size ?? 22} color={color} />
+            <House size={size ?? 22} color={color} />
           ),
         }}
       />
@@ -66,7 +66,7 @@ export default function TabLayout() {
           title: 'Insights',
           headerTitle: 'Financial Insights',
           tabBarIcon: ({ color, size }) => (
-            <PieChart size={size ?? 22} color={color} />
+            <ChartNoAxesCombined size={size ?? 22} color={color} />
           ),
         }}
       />

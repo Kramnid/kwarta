@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TextInput, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { X, Check, ArrowDownCircle, ArrowUpCircle } from 'lucide-react-native';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
 export default function AddTransactionModal() {
   const router = useRouter();
-  const [type, setType] = useState<'expense' | 'income'>('expense');
+  const params = useLocalSearchParams<{ type?: string }>();
+  const [selectedType, setSelectedType] = useState<'expense' | 'income' | null>(null);
+  const type: 'expense' | 'income' =
+    selectedType ?? (params.type === 'income' ? 'income' : 'expense');
+  const setType = (newType: 'expense' | 'income') => setSelectedType(newType);
+
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
