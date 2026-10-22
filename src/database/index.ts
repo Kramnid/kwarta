@@ -3,23 +3,10 @@
  * Uses Expo SQLite with WAL mode, foreign-key constraints, and versioned migrations.
  */
 
-import * as SQLite from 'expo-sqlite';
-import { DATABASE_NAME, CURRENT_SCHEMA_VERSION } from './schema';
+import { CURRENT_SCHEMA_VERSION } from './schema';
 import { runMigrations } from './migrations';
+import { getDatabase } from './client';
 import { DatabaseInitResult } from '@/types';
-
-let dbInstance: SQLite.SQLiteDatabase | null = null;
-
-/**
- * Returns the active SQLite database instance.
- * Lazily creates the instance if not already initialized.
- */
-export function getDatabase(): SQLite.SQLiteDatabase {
-  if (!dbInstance) {
-    dbInstance = SQLite.openDatabaseSync(DATABASE_NAME);
-  }
-  return dbInstance;
-}
 
 /**
  * Centralized database initialization with schema versioning and error handling.
@@ -44,6 +31,7 @@ export async function initDatabase(): Promise<DatabaseInitResult> {
   }
 }
 
+export * from './client';
 export * from './schema';
 export * from './migrations';
 export * from './categories';

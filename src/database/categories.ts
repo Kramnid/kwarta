@@ -4,7 +4,7 @@
 
 import * as SQLite from 'expo-sqlite';
 import { TransactionCategory, TransactionType } from '@/types/finance';
-import { getDatabase } from './index';
+import { getDatabase } from './client';
 
 export async function getAllCategories(
   database?: SQLite.SQLiteDatabase

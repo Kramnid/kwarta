@@ -9,7 +9,7 @@ import {
   Transaction,
   CreateTransactionInput,
 } from '@/types/finance';
-import { getDatabase } from './index';
+import { getDatabase } from './client';
 
 export function generateTransactionId(): string {
   const timestamp = Date.now();
