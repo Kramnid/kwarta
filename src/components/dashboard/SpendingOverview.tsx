@@ -22,8 +22,8 @@ export function SpendingOverview({
   const currentMonth = formatCurrentMonth();
   const formattedTotal = formatCentavosToPhp(totalExpensesCentavos);
 
-  const handleViewInsights = () => {
-    router.push('/(tabs)/insights');
+  const handleViewAnalytics = () => {
+    router.push('/(tabs)/analytics');
   };
 
   const handleAddExpense = () => {
@@ -41,8 +41,8 @@ export function SpendingOverview({
     <View className={`mb-6 ${className}`}>
       <SectionHeader
         title="Spending Overview"
-        actionText="View Insights"
-        onActionPress={handleViewInsights}
+        actionText="View Analytics"
+        onActionPress={handleViewAnalytics}
       />
 
       <View className="bg-[#151F30] rounded-2xl p-4 border border-slate-700/60 shadow-sm">
@@ -139,11 +139,11 @@ export function SpendingOverview({
             {/* Remaining categories prompt */}
             {remainingCount > 0 && (
               <Pressable
-                onPress={handleViewInsights}
+                onPress={handleViewAnalytics}
                 className="flex-row items-center justify-center pt-2 mt-1 border-t border-slate-700/50 active:opacity-70"
               >
                 <Text className="text-emerald-400 text-xs font-medium mr-1">
-                  +{remainingCount} more categories in Insights
+                  +{remainingCount} more categories in Analytics
                 </Text>
                 <ArrowRight size={13} color="#10B981" />
               </Pressable>

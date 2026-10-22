@@ -19,7 +19,7 @@ import { FinancialInsightCard } from '@/components/insights/FinancialInsightCard
 import { BudgetPerformanceCard } from '@/components/insights/BudgetPerformanceCard';
 import { InsightsEmptyState } from '@/components/insights/InsightsEmptyState';
 
-export default function InsightsScreen() {
+export default function AnalyticsScreen() {
   const {
     analytics,
     selectedOption,

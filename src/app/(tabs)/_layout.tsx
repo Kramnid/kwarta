@@ -5,8 +5,8 @@ import {
   House,
   ArrowLeftRight,
   WalletCards,
+  PiggyBank,
   ChartNoAxesCombined,
-  Settings,
 } from 'lucide-react-native';
 
 export default function TabLayout() {
@@ -73,22 +73,22 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="insights"
+        name="savings"
         options={{
-          title: 'Insights',
-          headerTitle: 'Financial Insights',
+          title: 'Savings',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <ChartNoAxesCombined size={size ?? 22} color={color} />
+            <PiggyBank size={size ?? 22} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="analytics"
         options={{
-          title: 'Settings',
-          headerTitle: 'Settings',
+          title: 'Analytics',
+          headerTitle: 'Financial Analytics',
           tabBarIcon: ({ color, size }) => (
-            <Settings size={size ?? 22} color={color} />
+            <ChartNoAxesCombined size={size ?? 22} color={color} />
           ),
         }}
       />

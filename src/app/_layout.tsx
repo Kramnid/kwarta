@@ -100,9 +100,9 @@ export default function RootLayout() {
             }}
           />
 
-          {/* Savings Goals Main Screen */}
+          {/* Settings Screen */}
           <Stack.Screen
-            name="savings/index"
+            name="settings"
             options={{
               headerShown: false,
             }}

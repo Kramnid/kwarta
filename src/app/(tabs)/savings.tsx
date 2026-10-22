@@ -8,11 +8,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Plus, ArrowLeft } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useSavingsStore } from '@/store';
 import { SavingsGoalStatus } from '@/types/savings';
 import { calculateSavingsSummary } from '@/utils/savings';
+import { Button } from '@/components/ui/Button';
 import {
   SavingsSummaryCard,
   SavingsGoalCard,
@@ -21,7 +22,7 @@ import {
 
 type FilterType = 'all' | SavingsGoalStatus;
 
-export default function SavingsGoalsScreen() {
+export default function SavingsTabScreen() {
   const router = useRouter();
   const { savingsGoals, refreshSavings, isLoadingSavings } = useSavingsStore();
 
@@ -35,7 +36,6 @@ export default function SavingsGoalsScreen() {
 
   const filteredGoals = useMemo(() => {
     if (activeFilter === 'all') {
-      // Show active and completed first, archived at bottom or filtered separately
       return savingsGoals.filter((g) => g.status !== 'archived');
     }
     return savingsGoals.filter((g) => g.status === activeFilter);
@@ -77,41 +77,13 @@ export default function SavingsGoalsScreen() {
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-[#0B1220]">
-      {/* Top Navigation Header */}
-      <View className="px-5 py-3 flex-row items-center justify-between border-b border-slate-800/80">
-        <View className="flex-row items-center flex-1 mr-3">
-          <Pressable
-            onPress={() => router.back()}
-            className="w-10 h-10 rounded-2xl bg-slate-800/80 items-center justify-center mr-3 active:bg-slate-700 border border-slate-700/60"
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <ArrowLeft size={18} color="#F8FAFC" />
-          </Pressable>
-
-          <View className="flex-1">
-            <Text className="text-white text-xl font-bold tracking-tight">
-              Savings Goals
-            </Text>
-            <Text className="text-slate-400 text-xs">
-              Turn your plans into progress.
-            </Text>
-          </View>
-        </View>
-
-        <Pressable
-          onPress={handleCreate}
-          className="w-10 h-10 rounded-2xl bg-emerald-600 items-center justify-center active:bg-emerald-700 shadow-sm"
-          accessibilityRole="button"
-          accessibilityLabel="Create new savings goal"
-        >
-          <Plus size={20} color="#FFFFFF" strokeWidth={2.5} />
-        </Pressable>
-      </View>
-
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 96,
+        }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -122,10 +94,40 @@ export default function SavingsGoalsScreen() {
           />
         }
       >
-        {/* 1. Summary Card */}
-        <SavingsSummaryCard summary={summary} className="mb-5" />
+        {/* 1. Header Bar matching Kwarta Tab Design System */}
+        <View className="flex-row items-center justify-between mb-4 pt-1">
+          <View className="flex-1 mr-3">
+            <View className="flex-row items-center flex-wrap">
+              <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
+                SAVINGS & TARGETS
+              </Text>
+              <Text className="text-slate-600 text-xs mx-1.5">•</Text>
+              <Text className="text-emerald-400 text-xs font-medium">
+                {summary.activeGoalsCount}{' '}
+                {summary.activeGoalsCount === 1 ? 'Active Goal' : 'Active Goals'}
+              </Text>
+            </View>
 
-        {/* 2. Filter Chips */}
+            <Text className="text-white text-[26px] font-extrabold tracking-tight mt-0.5">
+              Savings Goals
+            </Text>
+            <Text className="text-slate-400 text-xs mt-0.5">
+              Turn your plans into progress.
+            </Text>
+          </View>
+
+          <Button
+            title="Add"
+            size="sm"
+            onPress={handleCreate}
+            leftIcon={<Plus size={15} color="#FFFFFF" strokeWidth={2.5} />}
+          />
+        </View>
+
+        {/* 2. Summary Card */}
+        <SavingsSummaryCard summary={summary} className="mb-4" />
+
+        {/* 3. Filter Chips */}
         <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/60 mb-5">
           {filterTabs.map((tab) => {
             const isSelected = activeFilter === tab.id;
@@ -165,7 +167,7 @@ export default function SavingsGoalsScreen() {
           })}
         </View>
 
-        {/* 3. Goals List or Empty State */}
+        {/* 4. Goals List or Empty State */}
         {filteredGoals.length === 0 ? (
           <SavingsEmptyState filterStatus={activeFilter} />
         ) : (

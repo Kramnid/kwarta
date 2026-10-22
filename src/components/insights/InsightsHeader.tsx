@@ -8,10 +8,10 @@ export function InsightsHeader() {
       <View className="flex-row items-center justify-between">
         <View className="flex-1 mr-3">
           <Text className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
-            Financial Analytics
+            Financial Insights
           </Text>
           <Text className="text-white text-2xl font-bold tracking-tight mt-0.5">
-            Insights
+            Analytics
           </Text>
           <Text className="text-slate-400 text-xs mt-1">
             Understand your money better.

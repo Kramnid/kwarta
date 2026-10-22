@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import { User, Sparkles } from 'lucide-react-native';
+import { Settings, Sparkles } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { formatGreeting } from '@/utils/date';
 import { useAppStore } from '@/store';
@@ -25,13 +25,13 @@ export function DashboardHeader({
     day: 'numeric',
   });
 
-  const handleAvatarPress = () => {
+  const handleSettingsPress = () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
       // Fallback
     }
-    router.push('/(tabs)/settings');
+    router.push('/settings' as any);
   };
 
   const handleDemoPillPress = () => {
@@ -84,16 +84,16 @@ export function DashboardHeader({
         </Text>
       </View>
 
-      {/* Right side: Circular Avatar / Settings shortcut with active indicator */}
+      {/* Right side: Circular Settings shortcut with active indicator */}
       <Pressable
-        onPress={handleAvatarPress}
+        onPress={handleSettingsPress}
         accessibilityRole="button"
         accessibilityLabel="Go to Settings"
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         className="w-12 h-12 rounded-full bg-slate-800 border border-slate-700/80 items-center justify-center active:bg-slate-700 active:border-emerald-500/40 shadow-sm relative transition-all"
       >
         <View className="w-10 h-10 rounded-full bg-[#151F30] items-center justify-center">
-          <User size={19} color="#10B981" />
+          <Settings size={19} color="#10B981" />
         </View>
         {/* Subtle active status indicator dot */}
         <View className="absolute top-0 right-0 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#0B1220]" />
