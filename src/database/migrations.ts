@@ -21,6 +21,9 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   );
   const currentVersion = versionRow?.user_version ?? 0;
 
+  // Ensure budgets table matches modern schema (handles legacy prototype table from Step 1)
+  await ensureBudgetsSchema(db);
+
   if (currentVersion >= CURRENT_SCHEMA_VERSION) {
     // Schema is up to date; ensure categories are seeded idempotently
     await seedDefaultCategories(db);
@@ -58,29 +61,15 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
         );
       `);
 
-      // 3. Create budgets table (Step 4)
-      await db.execAsync(`
-        CREATE TABLE IF NOT EXISTS budgets (
-          id TEXT PRIMARY KEY,
-          category_id TEXT NULL REFERENCES categories(id) ON DELETE CASCADE,
-          amount_centavos INTEGER NOT NULL CHECK(amount_centavos > 0),
-          month TEXT NOT NULL CHECK(length(month) = 7),
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-      `);
-
-      // 4. Create indexes for performance and constraints
+      // 3. Create indexes for performance
       await db.execAsync(`
         CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(transaction_date);
         CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(category_id);
         CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
-
-        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_overall_month ON budgets(month) WHERE category_id IS NULL;
-        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_category_month ON budgets(category_id, month) WHERE category_id IS NOT NULL;
-        CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month);
-        CREATE INDEX IF NOT EXISTS idx_budgets_category ON budgets(category_id);
       `);
+
+      // 4. Ensure budgets table & indexes
+      await ensureBudgetsSchema(db);
 
       // 5. Seed default categories
       await seedDefaultCategories(db);
@@ -190,28 +179,52 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   // Version 2 -> 3 (Upgrade: Add budgets table and unique indexes)
   if (currentVersion < 3) {
     await db.withTransactionAsync(async () => {
-      await db.execAsync(`
-        CREATE TABLE IF NOT EXISTS budgets (
-          id TEXT PRIMARY KEY,
-          category_id TEXT NULL REFERENCES categories(id) ON DELETE CASCADE,
-          amount_centavos INTEGER NOT NULL CHECK(amount_centavos > 0),
-          month TEXT NOT NULL CHECK(length(month) = 7),
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL
-        );
-
-        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_overall_month ON budgets(month) WHERE category_id IS NULL;
-        CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_category_month ON budgets(category_id, month) WHERE category_id IS NOT NULL;
-        CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month);
-        CREATE INDEX IF NOT EXISTS idx_budgets_category ON budgets(category_id);
-
-        PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};
-      `);
+      await ensureBudgetsSchema(db);
+      await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
     });
   }
 
   // Ensure categories are present
   await seedDefaultCategories(db);
+}
+
+/**
+ * Ensures the budgets table exists and conforms to the Step 4 schema (including the 'month' column).
+ * Handles upgrading any legacy prototype table from Step 1 where 'month' did not exist.
+ */
+export async function ensureBudgetsSchema(db: SQLite.SQLiteDatabase): Promise<void> {
+  const tableInfo = await db.getAllAsync<{ name: string }>(
+    "PRAGMA table_info(budgets);"
+  );
+  const columnNames = new Set((tableInfo || []).map((col) => col.name));
+
+  if (tableInfo.length > 0 && !columnNames.has('month')) {
+    // Drop old indexes and old prototype table from Step 1
+    await db.execAsync(`
+      DROP INDEX IF EXISTS idx_budgets_category;
+      DROP INDEX IF EXISTS uq_budgets_overall_month;
+      DROP INDEX IF EXISTS uq_budgets_category_month;
+      DROP INDEX IF EXISTS idx_budgets_month;
+      DROP TABLE IF EXISTS budgets;
+    `);
+  }
+
+  // Create the modern Step 4 budgets table
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS budgets (
+      id TEXT PRIMARY KEY,
+      category_id TEXT NULL REFERENCES categories(id) ON DELETE CASCADE,
+      amount_centavos INTEGER NOT NULL CHECK(amount_centavos > 0),
+      month TEXT NOT NULL CHECK(length(month) = 7),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_overall_month ON budgets(month) WHERE category_id IS NULL;
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_budgets_category_month ON budgets(category_id, month) WHERE category_id IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month);
+    CREATE INDEX IF NOT EXISTS idx_budgets_category ON budgets(category_id);
+  `);
 }
 
 /**

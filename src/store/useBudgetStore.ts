@@ -21,7 +21,6 @@ import {
   getPreviousMonthString,
   getNextMonthString,
 } from '@/utils/budget';
-import { useAppStore } from './index';
 
 interface BudgetState {
   selectedMonth: string; // YYYY-MM
@@ -68,11 +67,6 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   budgetError: null,
 
   refreshBudgets: async () => {
-    const isReady = useAppStore.getState().isDatabaseReady;
-    if (!isReady) {
-      return;
-    }
-
     try {
       set({ isLoadingBudgets: true, budgetError: null });
       const loaded = await getAllBudgets();
@@ -85,33 +79,18 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   },
 
   createBudget: async (input: CreateBudgetInput) => {
-    const isReady = useAppStore.getState().isDatabaseReady;
-    if (!isReady) {
-      throw new Error('Database is not initialized.');
-    }
-
     const created = await dbInsertBudget(input);
     await get().refreshBudgets();
     return created;
   },
 
   updateBudget: async (id: string, input: UpdateBudgetInput) => {
-    const isReady = useAppStore.getState().isDatabaseReady;
-    if (!isReady) {
-      throw new Error('Database is not initialized.');
-    }
-
     const updated = await dbUpdateBudget(id, input);
     await get().refreshBudgets();
     return updated;
   },
 
   deleteBudget: async (id: string) => {
-    const isReady = useAppStore.getState().isDatabaseReady;
-    if (!isReady) {
-      throw new Error('Database is not initialized.');
-    }
-
     const success = await dbDeleteBudget(id);
     if (success) {
       await get().refreshBudgets();
