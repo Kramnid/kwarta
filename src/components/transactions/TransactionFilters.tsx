@@ -127,24 +127,28 @@ export function TransactionFilters({
             if (t === 'income') label = 'Income';
             if (t === 'expense') label = 'Expenses';
 
-            let activeClass = 'bg-slate-800 border border-slate-600/50 shadow-sm';
-            let textActiveClass = 'text-white font-bold';
+            let activeStyle: any = undefined;
+            let textActiveColor = '#94A3B8';
 
-            if (t === 'income') {
-              activeClass = 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm';
-              textActiveClass = 'text-emerald-400 font-bold';
-            } else if (t === 'expense') {
-              activeClass = 'bg-rose-500/20 border border-rose-500/40 shadow-sm';
-              textActiveClass = 'text-rose-400 font-bold';
+            if (isSelected) {
+              if (t === 'all') {
+                activeStyle = { backgroundColor: '#1E293B', borderColor: '#475569', borderWidth: 1 };
+                textActiveColor = '#FFFFFF';
+              } else if (t === 'income') {
+                activeStyle = { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: 'rgba(16, 185, 129, 0.4)', borderWidth: 1 };
+                textActiveColor = '#34D399';
+              } else if (t === 'expense') {
+                activeStyle = { backgroundColor: 'rgba(244, 63, 94, 0.15)', borderColor: 'rgba(244, 63, 94, 0.4)', borderWidth: 1 };
+                textActiveColor = '#FB7185';
+              }
             }
 
             return (
               <Pressable
                 key={t}
                 onPress={() => handleTypeSelect(t)}
-                className={`flex-1 py-2 rounded-xl flex-row items-center justify-center ${
-                  isSelected ? activeClass : ''
-                }`}
+                className="flex-1 py-2 rounded-xl flex-row items-center justify-center"
+                style={activeStyle}
               >
                 {t === 'income' && (
                   <ArrowUp
@@ -163,9 +167,11 @@ export function TransactionFilters({
                   />
                 )}
                 <Text
-                  className={`text-xs ${
-                    isSelected ? textActiveClass : 'text-slate-400 font-medium'
-                  }`}
+                  className="text-xs"
+                  style={{
+                    color: textActiveColor,
+                    fontWeight: isSelected ? '700' : '500',
+                  }}
                 >
                   {label}
                 </Text>

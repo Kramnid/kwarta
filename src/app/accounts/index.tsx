@@ -106,7 +106,7 @@ export default function ManageAccountsScreen() {
         <View className="flex-row items-center flex-1 mr-3">
           <Pressable
             onPress={() => router.back()}
-            className="w-10 h-10 rounded-2xl bg-slate-800/80 items-center justify-center mr-3 active:bg-slate-700 border border-slate-700/60"
+            className="w-10 h-10 rounded-2xl bg-slate-800 items-center justify-center mr-3 active:bg-slate-700 border border-slate-700"
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
@@ -140,14 +140,20 @@ export default function ManageAccountsScreen() {
         <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/80 mb-5">
           <Pressable
             onPress={() => setActiveFilter('all')}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-              activeFilter === 'all' ? 'bg-slate-800 border border-slate-600 shadow-sm' : ''
-            }`}
+            className="flex-1 py-2.5 rounded-xl items-center justify-center"
+            style={
+              activeFilter === 'all'
+                ? {
+                    backgroundColor: '#1E293B',
+                    borderColor: '#475569',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                activeFilter === 'all' ? 'text-white' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: activeFilter === 'all' ? '#FFFFFF' : '#94A3B8' }}
             >
               All ({cards.length})
             </Text>
@@ -155,14 +161,20 @@ export default function ManageAccountsScreen() {
 
           <Pressable
             onPress={() => setActiveFilter('debit')}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-              activeFilter === 'debit' ? 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm' : ''
-            }`}
+            className="flex-1 py-2.5 rounded-xl items-center justify-center"
+            style={
+              activeFilter === 'debit'
+                ? {
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderColor: 'rgba(16, 185, 129, 0.4)',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                activeFilter === 'debit' ? 'text-emerald-400' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: activeFilter === 'debit' ? '#34D399' : '#94A3B8' }}
             >
               Debit ({debitCount})
             </Text>
@@ -170,14 +182,20 @@ export default function ManageAccountsScreen() {
 
           <Pressable
             onPress={() => setActiveFilter('credit')}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-              activeFilter === 'credit' ? 'bg-indigo-500/20 border border-indigo-500/40 shadow-sm' : ''
-            }`}
+            className="flex-1 py-2.5 rounded-xl items-center justify-center"
+            style={
+              activeFilter === 'credit'
+                ? {
+                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                    borderColor: 'rgba(99, 102, 241, 0.4)',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                activeFilter === 'credit' ? 'text-indigo-400' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: activeFilter === 'credit' ? '#818CF8' : '#94A3B8' }}
             >
               Credit ({creditCount})
             </Text>
@@ -311,7 +329,12 @@ export default function ManageAccountsScreen() {
 
                     <Pressable
                       onPress={() => handlePromptDelete(card)}
-                      className="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-500/30 items-center justify-center active:bg-rose-500/25"
+                      className="w-8 h-8 rounded-xl items-center justify-center"
+                      style={{
+                        backgroundColor: 'rgba(244, 63, 94, 0.15)',
+                        borderColor: 'rgba(244, 63, 94, 0.35)',
+                        borderWidth: 1,
+                      }}
                       accessibilityLabel="Delete card"
                     >
                       <Trash2 size={14} color="#F87171" />

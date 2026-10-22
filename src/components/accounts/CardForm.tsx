@@ -308,14 +308,20 @@ export function CardForm({
         <View className="flex-row bg-[#0B1220] p-1 rounded-2xl border border-slate-800">
           <Pressable
             onPress={() => setType('debit')}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-              type === 'debit' ? 'bg-emerald-500/20 border border-emerald-500/40' : ''
-            }`}
+            className="flex-1 py-2.5 rounded-xl items-center justify-center"
+            style={
+              type === 'debit'
+                ? {
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderColor: 'rgba(16, 185, 129, 0.4)',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                type === 'debit' ? 'text-emerald-400' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: type === 'debit' ? '#34D399' : '#94A3B8' }}
             >
               Debit Card
             </Text>
@@ -323,14 +329,20 @@ export function CardForm({
 
           <Pressable
             onPress={() => setType('credit')}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center ${
-              type === 'credit' ? 'bg-indigo-500/20 border border-indigo-500/40' : ''
-            }`}
+            className="flex-1 py-2.5 rounded-xl items-center justify-center"
+            style={
+              type === 'credit'
+                ? {
+                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                    borderColor: 'rgba(99, 102, 241, 0.4)',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                type === 'credit' ? 'text-indigo-400' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: type === 'credit' ? '#818CF8' : '#94A3B8' }}
             >
               Credit Card
             </Text>
@@ -378,21 +390,41 @@ export function CardForm({
           <View className="flex-row bg-[#0B1220] p-1 rounded-2xl border border-slate-700/80">
             <Pressable
               onPress={() => setNetwork('Visa')}
-              className={`flex-1 py-2 rounded-xl items-center justify-center ${
-                network === 'Visa' ? 'bg-emerald-500/20 border border-emerald-500/40' : ''
-              }`}
+              className="flex-1 py-2 rounded-xl items-center justify-center"
+              style={
+                network === 'Visa'
+                  ? {
+                      backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                      borderColor: 'rgba(16, 185, 129, 0.4)',
+                      borderWidth: 1,
+                    }
+                  : undefined
+              }
             >
-              <Text className={`text-xs font-bold ${network === 'Visa' ? 'text-emerald-400' : 'text-slate-400'}`}>
+              <Text
+                className="text-xs font-bold"
+                style={{ color: network === 'Visa' ? '#34D399' : '#94A3B8' }}
+              >
                 Visa
               </Text>
             </Pressable>
             <Pressable
               onPress={() => setNetwork('Mastercard')}
-              className={`flex-1 py-2 rounded-xl items-center justify-center ${
-                network === 'Mastercard' ? 'bg-indigo-500/20 border border-indigo-500/40' : ''
-              }`}
+              className="flex-1 py-2 rounded-xl items-center justify-center"
+              style={
+                network === 'Mastercard'
+                  ? {
+                      backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                      borderColor: 'rgba(99, 102, 241, 0.4)',
+                      borderWidth: 1,
+                    }
+                  : undefined
+              }
             >
-              <Text className={`text-xs font-bold ${network === 'Mastercard' ? 'text-indigo-400' : 'text-slate-400'}`}>
+              <Text
+                className="text-xs font-bold"
+                style={{ color: network === 'Mastercard' ? '#818CF8' : '#94A3B8' }}
+              >
                 MC
               </Text>
             </Pressable>

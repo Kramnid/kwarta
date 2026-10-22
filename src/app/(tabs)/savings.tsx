@@ -160,28 +160,36 @@ export default function SavingsTabScreen() {
                   <Pressable
                     key={tab.id}
                     onPress={() => handleFilterSelect(tab.id)}
-                    className={`flex-1 py-2 rounded-xl items-center justify-center flex-row ${
+                    className="flex-1 py-2 rounded-xl items-center justify-center flex-row"
+                    style={
                       isSelected
-                        ? 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm'
-                        : ''
-                    }`}
+                        ? {
+                            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                            borderColor: 'rgba(16, 185, 129, 0.4)',
+                            borderWidth: 1,
+                          }
+                        : undefined
+                    }
                     accessibilityRole="button"
                     accessibilityLabel={`Filter ${tab.label}`}
                   >
                     <Text
-                      className={`text-xs ${
-                        isSelected ? 'text-emerald-400 font-bold' : 'text-slate-400 font-medium'
-                      }`}
+                      className="text-xs"
+                      style={{
+                        color: isSelected ? '#34D399' : '#94A3B8',
+                        fontWeight: isSelected ? '700' : '500',
+                      }}
                     >
                       {tab.label}
                     </Text>
                     {tab.count !== undefined && tab.count > 0 ? (
                       <Text
-                        className={`text-[10px] ml-1 px-1.5 py-0.2 rounded-full ${
-                          isSelected
-                            ? 'bg-emerald-500/30 text-emerald-300 font-bold'
-                            : 'bg-slate-800 text-slate-400'
-                        }`}
+                        className="text-[10px] ml-1 px-1.5 py-0.2 rounded-full"
+                        style={{
+                          backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.3)' : '#1E293B',
+                          color: isSelected ? '#6EE7B7' : '#94A3B8',
+                          fontWeight: isSelected ? '700' : '400',
+                        }}
                       >
                         {tab.count}
                       </Text>

@@ -167,7 +167,7 @@ export default function CategoryManagementScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Type Segment Control: Expense vs Income */}
-        <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/60 mb-5 shadow-sm">
+        <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/60 mb-5">
           <Pressable
             onPress={() => {
               try {
@@ -175,16 +175,20 @@ export default function CategoryManagementScreen() {
               } catch {}
               setActiveType('expense');
             }}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center flex-row ${
+            className="flex-1 py-2.5 rounded-xl items-center justify-center flex-row"
+            style={
               activeType === 'expense'
-                ? 'bg-rose-500/20 border border-rose-500/40 shadow-sm'
-                : ''
-            }`}
+                ? {
+                    backgroundColor: 'rgba(244, 63, 94, 0.15)',
+                    borderColor: 'rgba(244, 63, 94, 0.4)',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                activeType === 'expense' ? 'text-rose-400' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: activeType === 'expense' ? '#FB7185' : '#94A3B8' }}
             >
               Expense Categories ({expenseCount})
             </Text>
@@ -197,16 +201,20 @@ export default function CategoryManagementScreen() {
               } catch {}
               setActiveType('income');
             }}
-            className={`flex-1 py-2.5 rounded-xl items-center justify-center flex-row ${
+            className="flex-1 py-2.5 rounded-xl items-center justify-center flex-row"
+            style={
               activeType === 'income'
-                ? 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm'
-                : ''
-            }`}
+                ? {
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderColor: 'rgba(16, 185, 129, 0.4)',
+                    borderWidth: 1,
+                  }
+                : undefined
+            }
           >
             <Text
-              className={`text-xs font-bold ${
-                activeType === 'income' ? 'text-emerald-400' : 'text-slate-400'
-              }`}
+              className="text-xs font-bold"
+              style={{ color: activeType === 'income' ? '#34D399' : '#94A3B8' }}
             >
               Income Categories ({incomeCount})
             </Text>
