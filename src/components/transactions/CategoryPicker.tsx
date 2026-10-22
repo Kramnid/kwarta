@@ -1,12 +1,6 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  LayoutAnimation,
-} from 'react-native';
-import { ChevronDown, ChevronUp, Check } from 'lucide-react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { TransactionCategory, TransactionType } from '@/types/finance';
 import { CategoryIcon } from './CategoryIcon';
@@ -32,21 +26,11 @@ export function CategoryPicker({
   disabledCategoryIds,
   disabledMessage = 'Already budgeted for this month',
   className = '',
-  label = 'Category',
+  label = 'Select Category',
 }: CategoryPickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
   // Filter categories to only show ones matching active transaction type
   const availableCategories = categories.filter((c) => c.type === type);
   const selectedCategory = availableCategories.find((c) => c.id === selectedCategoryId);
-
-  const toggleDropdown = () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsOpen(!isOpen);
-  };
 
   const handleSelect = (categoryId: string, isDisabled: boolean) => {
     if (isDisabled) {
@@ -60,235 +44,149 @@ export function CategoryPicker({
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {}
     onSelect(categoryId);
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setIsOpen(false);
   };
 
   return (
     <View className={`mb-4 ${className}`}>
-      {/* Header Label */}
-      <View className="flex-row items-center justify-between mb-2 px-0.5">
+      {/* Header */}
+      <View className="flex-row items-center justify-between mb-2.5 px-0.5">
         <Text className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">
           {label}
         </Text>
         {selectedCategory && (
-          <Text style={{ color: selectedCategory.color, fontSize: 11, fontWeight: '700' }}>
-            {selectedCategory.name}
-          </Text>
-        )}
-      </View>
-
-      {/* Dropdown Input Trigger */}
-      <TouchableOpacity
-        onPress={toggleDropdown}
-        activeOpacity={0.8}
-        accessibilityRole="combobox"
-        accessibilityLabel={`${label} dropdown`}
-        aria-expanded={isOpen}
-        style={{
-          backgroundColor: '#151F30',
-          borderRadius: isOpen ? 16 : 18,
-          borderBottomLeftRadius: isOpen ? 0 : 18,
-          borderBottomRightRadius: isOpen ? 0 : 18,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          borderWidth: 1.5,
-          borderColor: error
-            ? 'rgba(248, 113, 113, 0.8)'
-            : isOpen
-            ? '#10B981'
-            : 'rgba(51, 65, 85, 0.7)',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        {selectedCategory ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
+          <View className="flex-row items-center">
             <View
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                backgroundColor: `${selectedCategory.color}25`,
-                borderWidth: 1,
-                borderColor: `${selectedCategory.color}50`,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: 12,
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: selectedCategory.color,
+                marginRight: 6,
               }}
+            />
+            <Text
+              style={{ color: selectedCategory.color, fontSize: 12, fontWeight: '700' }}
             >
-              <CategoryIcon name={selectedCategory.icon} color={selectedCategory.color} size={18} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }} numberOfLines={1}>
-                {selectedCategory.name}
-              </Text>
-              <Text style={{ color: '#94A3B8', fontSize: 11, fontWeight: '500' }}>
-                Tap to change
-              </Text>
-            </View>
-          </View>
-        ) : (
-          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
-            <View
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                backgroundColor: '#1E293B',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: 12,
-              }}
-            >
-              <Text style={{ color: '#94A3B8', fontSize: 16 }}>?</Text>
-            </View>
-            <Text style={{ color: '#94A3B8', fontSize: 15, fontWeight: '600' }}>
-              Select a category...
+              {selectedCategory.name}
             </Text>
           </View>
         )}
+      </View>
 
-        {/* Dropdown Chevron Indicator */}
-        <View
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            backgroundColor: isOpen ? 'rgba(16, 185, 129, 0.15)' : '#1E293B',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderWidth: 1,
-            borderColor: isOpen ? '#10B981' : '#334155',
-          }}
-        >
-          {isOpen ? (
-            <ChevronUp size={16} color="#10B981" />
-          ) : (
-            <ChevronDown size={16} color="#94A3B8" />
-          )}
-        </View>
-      </TouchableOpacity>
+      {/* Visual Category Grid Card */}
+      <View
+        style={{
+          backgroundColor: '#151F30',
+          borderRadius: 20,
+          padding: 12,
+          borderWidth: 1.5,
+          borderColor: error ? 'rgba(248, 113, 113, 0.8)' : 'rgba(51, 65, 85, 0.7)',
+        }}
+      >
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          {availableCategories.map((cat) => {
+            const isSelected = cat.id === selectedCategoryId;
+            const isDisabled = !!disabledCategoryIds?.has(cat.id);
 
-      {/* Dropdown List Menu (Revealed on Open) */}
-      {isOpen && (
-        <View
-          style={{
-            backgroundColor: '#151F30',
-            borderBottomLeftRadius: 18,
-            borderBottomRightRadius: 18,
-            borderWidth: 1.5,
-            borderTopWidth: 0,
-            borderColor: '#10B981',
-            maxHeight: 260,
-            overflow: 'hidden',
-          }}
-        >
-          <ScrollView
-            nestedScrollEnabled
-            showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingVertical: 2 }}
-            style={{ width: '100%' }}
-          >
-            {availableCategories.map((cat, index) => {
-              const isSelected = cat.id === selectedCategoryId;
-              const isDisabled = !!disabledCategoryIds?.has(cat.id);
-              const isLast = index === availableCategories.length - 1;
+            return (
+              <TouchableOpacity
+                key={cat.id}
+                onPress={() => handleSelect(cat.id, isDisabled)}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={cat.name}
+                style={{
+                  width: '31%',
+                  marginBottom: 10,
+                  paddingVertical: 10,
+                  paddingHorizontal: 6,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: isSelected
+                    ? `${cat.color}22`
+                    : isDisabled
+                    ? '#0F172A'
+                    : '#1E293B',
+                  borderWidth: 1.5,
+                  borderColor: isSelected
+                    ? cat.color
+                    : isDisabled
+                    ? '#1E293B'
+                    : 'rgba(51, 65, 85, 0.6)',
+                  opacity: isDisabled ? 0.45 : 1,
+                  position: 'relative',
+                }}
+              >
+                {/* Active Checkmark Badge */}
+                {isSelected && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      width: 16,
+                      height: 16,
+                      borderRadius: 8,
+                      backgroundColor: cat.color,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Check size={10} color="#0B1220" strokeWidth={3} />
+                  </View>
+                )}
 
-              return (
-                <TouchableOpacity
-                  key={cat.id}
-                  onPress={() => handleSelect(cat.id, isDisabled)}
-                  activeOpacity={0.7}
-                  accessibilityRole="menuitem"
-                  accessibilityLabel={cat.name}
+                {/* Category Icon */}
+                <View
                   style={{
-                    flexDirection: 'row',
+                    width: 38,
+                    height: 38,
+                    borderRadius: 12,
+                    backgroundColor: isSelected ? `${cat.color}33` : `${cat.color}15`,
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    backgroundColor: isSelected
-                      ? 'rgba(16, 185, 129, 0.12)'
-                      : 'transparent',
-                    borderBottomWidth: isLast ? 0 : 1,
-                    borderBottomColor: 'rgba(51, 65, 85, 0.35)',
-                    opacity: isDisabled ? 0.45 : 1,
+                    justifyContent: 'center',
+                    marginBottom: 6,
                   }}
                 >
-                  {/* Left: Icon + Name */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 12 }}>
-                    <View
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: 10,
-                        backgroundColor: `${cat.color}20`,
-                        borderWidth: 1,
-                        borderColor: `${cat.color}40`,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: 12,
-                      }}
-                    >
-                      <CategoryIcon name={cat.icon} color={cat.color} size={18} />
-                    </View>
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        fontSize: 14,
-                        fontWeight: isSelected ? '800' : '600',
-                        color: isSelected ? '#10B981' : '#F1F5F9',
-                      }}
-                    >
-                      {cat.name}
-                    </Text>
-                  </View>
+                  <CategoryIcon name={cat.icon} color={cat.color} size={19} />
+                </View>
 
-                  {/* Right: Checkmark on Selected Item */}
-                  {isSelected && (
-                    <View
-                      style={{
-                        width: 22,
-                        height: 22,
-                        borderRadius: 11,
-                        backgroundColor: '#10B981',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Check size={13} color="#0B1220" strokeWidth={3} />
-                    </View>
-                  )}
+                {/* Category Name */}
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: isSelected ? '800' : '600',
+                    color: isSelected ? '#FFFFFF' : '#CBD5E1',
+                    textAlign: 'center',
+                  }}
+                >
+                  {cat.name}
+                </Text>
 
-                  {/* Right: Disabled / Budgeted Tag */}
-                  {isDisabled && (
-                    <View
-                      style={{
-                        backgroundColor: '#1E293B',
-                        paddingHorizontal: 8,
-                        paddingVertical: 3,
-                        borderRadius: 6,
-                        borderWidth: 1,
-                        borderColor: '#334155',
-                      }}
-                    >
-                      <Text style={{ fontSize: 10, fontWeight: '700', color: '#94A3B8' }}>
-                        Budgeted
-                      </Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+                {/* Disabled Badge */}
+                {isDisabled && (
+                  <Text
+                    style={{
+                      fontSize: 9,
+                      fontWeight: '700',
+                      color: '#94A3B8',
+                      marginTop: 2,
+                    }}
+                  >
+                    Budgeted
+                  </Text>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
-      )}
 
-      {error ? (
-        <Text className="text-red-400 text-xs mt-1.5 font-medium px-1">{error}</Text>
-      ) : null}
+        {error && (
+          <Text className="text-red-400 text-xs mt-1 font-medium px-1">{error}</Text>
+        )}
+      </View>
     </View>
   );
 }
