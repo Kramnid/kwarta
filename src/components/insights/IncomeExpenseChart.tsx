@@ -126,31 +126,64 @@ export function IncomeExpenseChart({ buckets }: IncomeExpenseChartProps) {
 
       {/* Selected Period Callout / Tooltip */}
       {selectedBucket && (
-        <View className="bg-slate-800/90 rounded-xl p-2.5 mb-2 border border-slate-700/80 flex-row items-center justify-between">
-          <View className="flex-1 mr-2">
-            <Text className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+        <View
+          style={{
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            backgroundColor: '#1E293B',
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: '#334155',
+            marginBottom: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <View style={{ flex: 1, marginRight: 8 }}>
+            <Text
+              style={{
+                color: '#94A3B8',
+                fontSize: 11,
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                marginBottom: 2,
+              }}
+            >
               {selectedBucket.fullPeriodLabel}
             </Text>
-            <View className="flex-row items-center gap-3 mt-0.5">
-              <Text className="text-emerald-400 text-xs font-bold">
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <Text style={{ color: '#10B981', fontSize: 12, fontWeight: '700' }}>
                 In: {formatCentavosToPhp(selectedBucket.incomeCentavos)}
               </Text>
-              <Text className="text-rose-400 text-xs font-bold">
+              <Text style={{ color: '#F87171', fontSize: 12, fontWeight: '700' }}>
                 Out: {formatCentavosToPhp(selectedBucket.expenseCentavos)}
               </Text>
             </View>
           </View>
 
-          <View className="items-end">
-            <Text className="text-slate-400 text-[10px] uppercase">Net</Text>
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text
+              style={{
+                color: '#94A3B8',
+                fontSize: 10,
+                fontWeight: '600',
+                textTransform: 'uppercase',
+              }}
+            >
+              Net
+            </Text>
             <Text
               style={{
                 color:
                   selectedBucket.incomeCentavos >= selectedBucket.expenseCentavos
                     ? '#10B981'
                     : '#F87171',
+                fontSize: 13,
+                fontWeight: '800',
+                marginTop: 1,
               }}
-              className="text-xs font-extrabold"
             >
               {selectedBucket.incomeCentavos >= selectedBucket.expenseCentavos
                 ? '+'

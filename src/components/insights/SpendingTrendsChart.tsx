@@ -131,18 +131,61 @@ export function SpendingTrendsChart({ points }: SpendingTrendsChartProps) {
 
       {/* Selected Point Tooltip Callout */}
       {selectedPoint && (
-        <View className="bg-slate-800/90 rounded-xl p-2.5 mb-2 border border-slate-700/80 flex-row items-center justify-between">
+        <View
+          style={{
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            backgroundColor: '#1E293B',
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: '#334155',
+            marginBottom: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <View>
-            <Text className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">
+            <Text
+              style={{
+                color: '#94A3B8',
+                fontSize: 11,
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+              }}
+            >
               {selectedPoint.fullDate}
             </Text>
-            <Text className="text-white text-xs font-bold mt-0.5">
+            <Text
+              style={{
+                color: '#FFFFFF',
+                fontSize: 12,
+                fontWeight: '700',
+                marginTop: 2,
+              }}
+            >
               Expenses: {formatCentavosToPhp(selectedPoint.amountCentavos)}
             </Text>
           </View>
 
-          <View className="bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-md">
-            <Text className="text-emerald-400 text-[10px] font-bold">
+          <View
+            style={{
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              borderColor: 'rgba(16, 185, 129, 0.3)',
+              borderWidth: 1,
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              borderRadius: 8,
+            }}
+          >
+            <Text
+              style={{
+                color: '#34D399',
+                fontSize: 11,
+                fontWeight: '700',
+              }}
+            >
               {selectedPoint.label}
             </Text>
           </View>
