@@ -59,7 +59,8 @@ export function FinancialOverviewCards({
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
-            className="text-emerald-400 text-xl font-black"
+            minimumFontScale={0.7}
+            className="text-emerald-400 text-lg font-extrabold"
           >
             {formatCentavosToPhp(overview.totalIncome)}
           </Text>
@@ -81,7 +82,8 @@ export function FinancialOverviewCards({
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
-            className="text-rose-400 text-xl font-black"
+            minimumFontScale={0.7}
+            className="text-rose-400 text-lg font-extrabold"
           >
             {formatCentavosToPhp(overview.totalExpenses)}
           </Text>
@@ -105,8 +107,9 @@ export function FinancialOverviewCards({
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
+            minimumFontScale={0.7}
             style={{ color: netColor }}
-            className="text-xl font-black"
+            className="text-lg font-extrabold"
           >
             {isNetPositive ? '+' : ''}
             {formatCentavosToPhp(overview.netCashFlow)}
@@ -128,8 +131,10 @@ export function FinancialOverviewCards({
           </View>
           <Text
             numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
             style={{ color: savingsRateColor }}
-            className="text-xl font-black"
+            className="text-lg font-extrabold"
           >
             {savingsRateDisplay}
           </Text>

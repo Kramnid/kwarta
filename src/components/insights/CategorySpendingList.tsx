@@ -89,6 +89,7 @@ export function CategorySpendingList({
                 <View
                   style={{
                     width: `${Math.min(Math.max(item.percentage, 0), 100)}%`,
+                    minWidth: 6,
                     backgroundColor: color,
                   }}
                   className="h-full rounded-full"

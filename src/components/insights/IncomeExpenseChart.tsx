@@ -132,135 +132,137 @@ export function IncomeExpenseChart({ buckets }: IncomeExpenseChartProps) {
         </View>
       )}
 
-      {/* SVG Bar Chart */}
-      <Svg width={containerWidth} height={chartHeight}>
-        {/* Horizontal Grid lines */}
-        {yTicks.map((tick) => {
-          const y =
-            paddingTop +
-            innerHeight -
-            (tick.value / safeMax) * innerHeight;
-          return (
-            <React.Fragment key={`grid-${tick.value}`}>
-              <Line
-                x1={paddingLeft}
-                y1={y}
-                x2={containerWidth - paddingRight}
-                y2={y}
-                stroke="#334155"
-                strokeDasharray="4 4"
-                strokeWidth="1"
-              />
-              <SvgText
-                x={paddingLeft - 6}
-                y={y + 3}
-                fill="#94A3B8"
-                fontSize="9"
-                fontWeight="500"
-                textAnchor="end"
-              >
-                {tick.label}
-              </SvgText>
-            </React.Fragment>
-          );
-        })}
-
-        {/* Grouped Bars */}
-        {buckets.map((bucket, index) => {
-          const isSelected = selectedIndex === index;
-          const slotCenterX =
-            paddingLeft + index * slotWidth + slotWidth / 2;
-
-          const incomeBarHeight = Math.max(
-            0,
-            (bucket.incomeCentavos / safeMax) * innerHeight
-          );
-          const expenseBarHeight = Math.max(
-            0,
-            (bucket.expenseCentavos / safeMax) * innerHeight
-          );
-
-          const incomeX = slotCenterX - barWidth - barGap / 2;
-          const expenseX = slotCenterX + barGap / 2;
-
-          const incomeY = paddingTop + innerHeight - incomeBarHeight;
-          const expenseY = paddingTop + innerHeight - expenseBarHeight;
-
-          return (
-            <React.Fragment key={`bucket-${bucket.key}`}>
-              {/* Highlight background column on selection */}
-              {isSelected && (
-                <Rect
-                  x={slotCenterX - slotWidth / 2 + 1}
-                  y={paddingTop}
-                  width={slotWidth - 2}
-                  height={innerHeight}
-                  fill="#1E293B"
-                  rx="4"
-                  opacity={0.6}
+      {/* Chart container with relative positioning */}
+      <View style={{ width: containerWidth, height: chartHeight, position: 'relative' }}>
+        <Svg width={containerWidth} height={chartHeight}>
+          {/* Horizontal Grid lines */}
+          {yTicks.map((tick) => {
+            const y =
+              paddingTop +
+              innerHeight -
+              (tick.value / safeMax) * innerHeight;
+            return (
+              <React.Fragment key={`grid-${tick.value}`}>
+                <Line
+                  x1={paddingLeft}
+                  y1={y}
+                  x2={containerWidth - paddingRight}
+                  y2={y}
+                  stroke="#334155"
+                  strokeDasharray="4 4"
+                  strokeWidth="1"
                 />
-              )}
+                <SvgText
+                  x={paddingLeft - 6}
+                  y={y + 3}
+                  fill="#94A3B8"
+                  fontSize="9"
+                  fontWeight="500"
+                  textAnchor="end"
+                >
+                  {tick.label}
+                </SvgText>
+              </React.Fragment>
+            );
+          })}
 
-              {/* Income Bar (Emerald) */}
-              <Rect
-                x={incomeX}
-                y={incomeBarHeight > 0 ? incomeY : paddingTop + innerHeight - 1}
-                width={barWidth}
-                height={Math.max(1, incomeBarHeight)}
-                fill="#10B981"
-                rx={Math.min(3, barWidth / 2)}
-                opacity={isSelected ? 1 : 0.85}
-              />
+          {/* Grouped Bars */}
+          {buckets.map((bucket, index) => {
+            const isSelected = selectedIndex === index;
+            const slotCenterX =
+              paddingLeft + index * slotWidth + slotWidth / 2;
 
-              {/* Expense Bar (Rose Red) */}
-              <Rect
-                x={expenseX}
-                y={expenseBarHeight > 0 ? expenseY : paddingTop + innerHeight - 1}
-                width={barWidth}
-                height={Math.max(1, expenseBarHeight)}
-                fill="#F87171"
-                rx={Math.min(3, barWidth / 2)}
-                opacity={isSelected ? 1 : 0.85}
-              />
+            const incomeBarHeight = Math.max(
+              0,
+              (bucket.incomeCentavos / safeMax) * innerHeight
+            );
+            const expenseBarHeight = Math.max(
+              0,
+              (bucket.expenseCentavos / safeMax) * innerHeight
+            );
 
-              {/* X Axis Label */}
-              <SvgText
-                x={slotCenterX}
-                y={chartHeight - 8}
-                fill={isSelected ? '#F8FAFC' : '#94A3B8'}
-                fontSize="9"
-                fontWeight={isSelected ? 'bold' : 'normal'}
-                textAnchor="middle"
-              >
-                {bucket.label}
-              </SvgText>
-            </React.Fragment>
-          );
-        })}
-      </Svg>
+            const incomeX = slotCenterX - barWidth - barGap / 2;
+            const expenseX = slotCenterX + barGap / 2;
 
-      {/* Tap interaction zone */}
-      <View
-        style={{
-          position: 'absolute',
-          left: paddingLeft,
-          top: paddingTop + 44, // offset below header
-          width: innerWidth,
-          height: innerHeight,
-          flexDirection: 'row',
-        }}
-      >
-        {buckets.map((b, i) => (
-          <TouchableOpacity
-            key={`touch-${b.key}`}
-            onPress={() => setSelectedIndex(i)}
-            activeOpacity={0.6}
-            style={{ flex: 1 }}
-          />
-        ))}
+            const incomeY = paddingTop + innerHeight - incomeBarHeight;
+            const expenseY = paddingTop + innerHeight - expenseBarHeight;
+
+            return (
+              <React.Fragment key={`bucket-${bucket.key}`}>
+                {/* Highlight background column on selection */}
+                {isSelected && (
+                  <Rect
+                    x={slotCenterX - slotWidth / 2 + 1}
+                    y={paddingTop}
+                    width={slotWidth - 2}
+                    height={innerHeight}
+                    fill="#1E293B"
+                    rx="4"
+                    opacity={0.6}
+                  />
+                )}
+
+                {/* Income Bar (Emerald) */}
+                <Rect
+                  x={incomeX}
+                  y={incomeBarHeight > 0 ? incomeY : paddingTop + innerHeight - 1}
+                  width={barWidth}
+                  height={Math.max(1, incomeBarHeight)}
+                  fill="#10B981"
+                  rx={Math.min(3, barWidth / 2)}
+                  opacity={isSelected ? 1 : 0.85}
+                />
+
+                {/* Expense Bar (Rose Red) */}
+                <Rect
+                  x={expenseX}
+                  y={expenseBarHeight > 0 ? expenseY : paddingTop + innerHeight - 1}
+                  width={barWidth}
+                  height={Math.max(1, expenseBarHeight)}
+                  fill="#F87171"
+                  rx={Math.min(3, barWidth / 2)}
+                  opacity={isSelected ? 1 : 0.85}
+                />
+
+                {/* X Axis Label */}
+                <SvgText
+                  x={slotCenterX}
+                  y={chartHeight - 8}
+                  fill={isSelected ? '#F8FAFC' : '#94A3B8'}
+                  fontSize="9"
+                  fontWeight={isSelected ? 'bold' : 'normal'}
+                  textAnchor="middle"
+                >
+                  {bucket.label}
+                </SvgText>
+              </React.Fragment>
+            );
+          })}
+        </Svg>
+
+        {/* Tap interaction zone perfectly aligned over SVG */}
+        <View
+          style={{
+            position: 'absolute',
+            left: paddingLeft,
+            top: paddingTop,
+            width: innerWidth,
+            height: innerHeight,
+            flexDirection: 'row',
+          }}
+        >
+          {buckets.map((b, i) => (
+            <TouchableOpacity
+              key={`touch-${b.key}`}
+              onPress={() => setSelectedIndex(i)}
+              activeOpacity={0.6}
+              style={{ flex: 1 }}
+            />
+          ))}
+        </View>
       </View>
 
-      <Text className="text-slate-400 text-[10px] text-center mt-1">
+      <Text className="text-slate-400 text-[10px] text-center mt-2">
         Tap any period column to view exact breakdown.
       </Text>
     </View>

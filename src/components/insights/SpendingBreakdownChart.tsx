@@ -153,8 +153,16 @@ export function SpendingBreakdownChart({
           {/* Center Callout */}
           <View
             pointerEvents="none"
-            style={{ width: chartSize - strokeWidth * 2 - 16 }}
-            className="absolute items-center justify-center text-center px-1"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingHorizontal: strokeWidth + 6,
+            }}
           >
             {activeCategory ? (
               <>

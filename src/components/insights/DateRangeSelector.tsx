@@ -154,6 +154,41 @@ export function DateRangeSelector({
               </View>
             )}
 
+            {/* Quick Preset Buttons */}
+            <View className="mb-4">
+              <Text className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-2">
+                Quick Shortcuts
+              </Text>
+              <View className="flex-row flex-wrap gap-1.5">
+                {[
+                  { label: 'Last 7 Days', days: 7 },
+                  { label: 'Last 14 Days', days: 14 },
+                  { label: 'Last 30 Days', days: 30 },
+                  { label: 'Last 90 Days', days: 90 },
+                ].map((preset) => (
+                  <TouchableOpacity
+                    key={preset.label}
+                    onPress={() => {
+                      const todayStr = getTodayLocalDate();
+                      const dateObj = new Date();
+                      dateObj.setDate(dateObj.getDate() - (preset.days - 1));
+                      const year = dateObj.getFullYear();
+                      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                      const day = String(dateObj.getDate()).padStart(2, '0');
+                      setModalStart(`${year}-${month}-${day}`);
+                      setModalEnd(todayStr);
+                      setValidationError(null);
+                    }}
+                    className="bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700/60 active:bg-slate-700"
+                  >
+                    <Text className="text-slate-300 text-[11px] font-medium">
+                      {preset.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
             {/* Start Date Input */}
             <View className="mb-3.5">
               <Text className="text-slate-400 text-xs font-semibold uppercase mb-1.5">

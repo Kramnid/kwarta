@@ -134,130 +134,132 @@ export function SpendingTrendsChart({ points }: SpendingTrendsChartProps) {
         </View>
       )}
 
-      {/* SVG Chart */}
-      <Svg width={containerWidth} height={chartHeight}>
-        <Defs>
-          <LinearGradient id="spendingGradient" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
-            <Stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-          </LinearGradient>
-        </Defs>
+      {/* Chart container with relative positioning */}
+      <View style={{ width: containerWidth, height: chartHeight, position: 'relative' }}>
+        <Svg width={containerWidth} height={chartHeight}>
+          <Defs>
+            <LinearGradient id="spendingGradient" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#10B981" stopOpacity="0.3" />
+              <Stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+            </LinearGradient>
+          </Defs>
 
-        {/* Horizontal grid lines */}
-        {yTicks.map((tick) => {
-          const y =
-            paddingTop +
-            innerHeight -
-            (tick.value / safeMax) * innerHeight;
-          return (
-            <React.Fragment key={`grid-line-${tick.value}`}>
-              <Line
-                x1={paddingLeft}
-                y1={y}
-                x2={containerWidth - paddingRight}
-                y2={y}
-                stroke="#334155"
-                strokeDasharray="4 4"
-                strokeWidth="1"
-              />
-              <SvgText
-                x={paddingLeft - 6}
-                y={y + 3}
-                fill="#94A3B8"
-                fontSize="9"
-                fontWeight="500"
-                textAnchor="end"
-              >
-                {tick.label}
-              </SvgText>
-            </React.Fragment>
-          );
-        })}
-
-        {/* Area Fill */}
-        {areaPathD ? (
-          <Path d={areaPathD} fill="url(#spendingGradient)" />
-        ) : null}
-
-        {/* Stroke Line */}
-        {linePathD ? (
-          <Path
-            d={linePathD}
-            stroke="#10B981"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        ) : null}
-
-        {/* Data points & X axis labels */}
-        {coords.map((c) => {
-          const isSelected = selectedIndex === c.index;
-          return (
-            <React.Fragment key={`point-${c.point.key}`}>
-              {/* Vertical guideline on selection */}
-              {isSelected && (
+          {/* Horizontal grid lines */}
+          {yTicks.map((tick) => {
+            const y =
+              paddingTop +
+              innerHeight -
+              (tick.value / safeMax) * innerHeight;
+            return (
+              <React.Fragment key={`grid-line-${tick.value}`}>
                 <Line
-                  x1={c.x}
-                  y1={paddingTop}
-                  x2={c.x}
-                  y2={paddingTop + innerHeight}
-                  stroke="#10B981"
-                  strokeDasharray="2 2"
+                  x1={paddingLeft}
+                  y1={y}
+                  x2={containerWidth - paddingRight}
+                  y2={y}
+                  stroke="#334155"
+                  strokeDasharray="4 4"
                   strokeWidth="1"
-                  opacity={0.6}
                 />
-              )}
+                <SvgText
+                  x={paddingLeft - 6}
+                  y={y + 3}
+                  fill="#94A3B8"
+                  fontSize="9"
+                  fontWeight="500"
+                  textAnchor="end"
+                >
+                  {tick.label}
+                </SvgText>
+              </React.Fragment>
+            );
+          })}
 
-              {/* Point Dot */}
-              <Circle
-                cx={c.x}
-                cy={c.y}
-                r={isSelected ? 5 : 3.5}
-                fill={isSelected ? '#10B981' : '#0B1220'}
-                stroke="#10B981"
-                strokeWidth={isSelected ? 2.5 : 1.5}
-              />
+          {/* Area Fill */}
+          {areaPathD ? (
+            <Path d={areaPathD} fill="url(#spendingGradient)" />
+          ) : null}
 
-              {/* X Axis Label */}
-              <SvgText
-                x={c.x}
-                y={chartHeight - 8}
-                fill={isSelected ? '#F8FAFC' : '#94A3B8'}
-                fontSize="9"
-                fontWeight={isSelected ? 'bold' : 'normal'}
-                textAnchor="middle"
-              >
-                {c.point.label}
-              </SvgText>
-            </React.Fragment>
-          );
-        })}
-      </Svg>
+          {/* Stroke Line */}
+          {linePathD ? (
+            <Path
+              d={linePathD}
+              stroke="#10B981"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          ) : null}
 
-      {/* Tap zones overlay */}
-      <View
-        style={{
-          position: 'absolute',
-          left: paddingLeft,
-          top: paddingTop + 44,
-          width: innerWidth,
-          height: innerHeight,
-          flexDirection: 'row',
-        }}
-      >
-        {coords.map((c) => (
-          <TouchableOpacity
-            key={`touch-point-${c.point.key}`}
-            onPress={() => setSelectedIndex(c.index)}
-            activeOpacity={0.6}
-            style={{ flex: 1 }}
-          />
-        ))}
+          {/* Data points & X axis labels */}
+          {coords.map((c) => {
+            const isSelected = selectedIndex === c.index;
+            return (
+              <React.Fragment key={`point-${c.point.key}`}>
+                {/* Vertical guideline on selection */}
+                {isSelected && (
+                  <Line
+                    x1={c.x}
+                    y1={paddingTop}
+                    x2={c.x}
+                    y2={paddingTop + innerHeight}
+                    stroke="#10B981"
+                    strokeDasharray="2 2"
+                    strokeWidth="1"
+                    opacity={0.6}
+                  />
+                )}
+
+                {/* Point Dot */}
+                <Circle
+                  cx={c.x}
+                  cy={c.y}
+                  r={isSelected ? 5 : 3.5}
+                  fill={isSelected ? '#10B981' : '#0B1220'}
+                  stroke="#10B981"
+                  strokeWidth={isSelected ? 2.5 : 1.5}
+                />
+
+                {/* X Axis Label */}
+                <SvgText
+                  x={c.x}
+                  y={chartHeight - 8}
+                  fill={isSelected ? '#F8FAFC' : '#94A3B8'}
+                  fontSize="9"
+                  fontWeight={isSelected ? 'bold' : 'normal'}
+                  textAnchor="middle"
+                >
+                  {c.point.label}
+                </SvgText>
+              </React.Fragment>
+            );
+          })}
+        </Svg>
+
+        {/* Tap zones overlay perfectly aligned with SVG */}
+        <View
+          style={{
+            position: 'absolute',
+            left: paddingLeft,
+            top: paddingTop,
+            width: innerWidth,
+            height: innerHeight,
+            flexDirection: 'row',
+          }}
+        >
+          {coords.map((c) => (
+            <TouchableOpacity
+              key={`touch-point-${c.point.key}`}
+              onPress={() => setSelectedIndex(c.index)}
+              activeOpacity={0.6}
+              style={{ flex: 1 }}
+            />
+          ))}
+        </View>
       </View>
 
-      <Text className="text-slate-400 text-[10px] text-center mt-1">
+      <Text className="text-slate-400 text-[10px] text-center mt-2">
         Tap any point along the curve to inspect spending.
       </Text>
     </View>
