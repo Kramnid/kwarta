@@ -5,6 +5,8 @@
  * on local calendar day components (YYYY-MM-DD).
  */
 
+import { DateFormatOption } from '@/types/settings';
+
 /**
  * Returns today's local date as an ISO calendar string (YYYY-MM-DD).
  */
@@ -21,6 +23,28 @@ export function formatLocalDate(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Formats a local date string (YYYY-MM-DD) according to the user's preferred format.
+ */
+export function formatDisplayDate(
+  dateStr: string,
+  format: DateFormatOption = 'MM/DD/YYYY'
+): string {
+  if (!dateStr) return '';
+  const cleanStr = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+  const parts = cleanStr.split('-');
+  if (parts.length !== 3) return dateStr;
+
+  const [year, month, day] = parts;
+  if (format === 'DD/MM/YYYY') {
+    return `${day}/${month}/${year}`;
+  }
+  if (format === 'YYYY-MM-DD') {
+    return `${year}-${month}-${day}`;
+  }
+  return `${month}/${day}/${year}`;
 }
 
 /**

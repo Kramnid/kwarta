@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useAppStore, useSavingsStore } from '@/store';
+import { useAppStore, useSavingsStore, useSettingsStore } from '@/store';
 import {
   calculateDashboardSummary,
   calculateSpendingByCategory,
@@ -23,6 +23,7 @@ import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 export default function HomeScreen() {
   const router = useRouter();
   const { transactions, refreshTransactions, isLoadingTransactions } = useAppStore();
+  const { displayName } = useSettingsStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Overall financial summary
@@ -85,7 +86,7 @@ export default function HomeScreen() {
         }
       >
         {/* 1. Dashboard Header (Greeting, Date, Avatar) */}
-        <DashboardHeader />
+        <DashboardHeader userName={displayName} />
 
         {/* 2. Total Balance Card (Emerald Gradient, Balance with separate symbol) */}
         <BalanceCard

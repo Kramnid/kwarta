@@ -21,9 +21,10 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   );
   const currentVersion = versionRow?.user_version ?? 0;
 
-  // Ensure budgets and savings tables match modern schema
+  // Ensure budgets, savings, and settings tables match modern schema
   await ensureBudgetsSchema(db);
   await ensureSavingsSchema(db);
+  await ensureSettingsSchema(db);
 
   if (currentVersion >= CURRENT_SCHEMA_VERSION) {
     // Schema is up to date; ensure categories are seeded idempotently
@@ -75,10 +76,13 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
       // 5. Ensure savings goals and entries tables & indexes
       await ensureSavingsSchema(db);
 
-      // 6. Seed default categories
+      // 6. Ensure settings table
+      await ensureSettingsSchema(db);
+
+      // 7. Seed default categories
       await seedDefaultCategories(db);
 
-      // 7. Update user_version
+      // 8. Update user_version
       await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
     });
     return;
@@ -192,6 +196,14 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   if (currentVersion < 4) {
     await db.withTransactionAsync(async () => {
       await ensureSavingsSchema(db);
+      await db.execAsync(`PRAGMA user_version = 4;`);
+    });
+  }
+
+  // Version 4 -> 5 (Upgrade: Add settings table)
+  if (currentVersion < 5) {
+    await db.withTransactionAsync(async () => {
+      await ensureSettingsSchema(db);
       await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
     });
   }
@@ -360,3 +372,17 @@ export async function seedDefaultCategories(
     );
   }
 }
+
+/**
+ * Ensures the settings table exists.
+ */
+export async function ensureSettingsSchema(db: SQLite.SQLiteDatabase): Promise<void> {
+  await db.execAsync(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+  `);
+}
+

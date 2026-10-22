@@ -20,6 +20,7 @@ import {
 } from '@/database';
 import { useBudgetStore } from './useBudgetStore';
 import { useSavingsStore } from './useSavingsStore';
+import { useSettingsStore } from './useSettingsStore';
 
 interface FinanceState {
   // Database status
@@ -77,6 +78,7 @@ export const useAppStore = create<FinanceState>((set, get) => ({
       get().refreshTransactions();
       useBudgetStore.getState().refreshBudgets();
       useSavingsStore.getState().refreshSavings();
+      useSettingsStore.getState().loadSettings();
     }
   },
   dbError: null,
@@ -201,4 +203,4 @@ export const useAppStore = create<FinanceState>((set, get) => ({
 
 // Export alias for architectures looking for useFinanceStore
 export const useFinanceStore = useAppStore;
-export { useBudgetStore, useSavingsStore };
+export { useBudgetStore, useSavingsStore, useSettingsStore };
