@@ -257,9 +257,20 @@ export default function ManageAccountsScreen() {
                   <View className="z-10 my-auto">
                     <View className="flex-row items-center justify-between mb-1">
                       {/* Metallic Chip */}
-                      <View className="w-10 h-7 rounded-md bg-amber-400/90 border border-amber-300 justify-center p-1 shadow-sm">
-                        <View className="w-full h-[1px] bg-amber-600/70 mb-1" />
-                        <View className="w-full h-[1px] bg-amber-600/70" />
+                      <View
+                        style={{
+                          width: 40,
+                          height: 28,
+                          borderRadius: 6,
+                          backgroundColor: '#F59E0B',
+                          borderColor: '#FDE68A',
+                          borderWidth: 1.5,
+                          justifyContent: 'center',
+                          padding: 4,
+                        }}
+                      >
+                        <View style={{ width: '100%', height: 1.5, backgroundColor: '#B45309', marginBottom: 4 }} />
+                        <View style={{ width: '100%', height: 1.5, backgroundColor: '#B45309' }} />
                       </View>
 
                       <Text className="text-white/80 text-[11px] font-medium">
