@@ -456,9 +456,11 @@ export function generateIncomeExpenseBuckets(
       const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
       const dayNum = dateObj.getDate();
 
+      const label = daysCount <= 7 ? dayName : String(dayNum);
+
       buckets.push({
         key: dateStr,
-        label: `${dayName} ${dayNum}`,
+        label,
         fullPeriodLabel: dateObj.toLocaleDateString('en-US', {
           weekday: 'short',
           month: 'short',

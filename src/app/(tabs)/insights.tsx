@@ -14,7 +14,6 @@ import { DateRangeSelector } from '@/components/insights/DateRangeSelector';
 import { FinancialOverviewCards } from '@/components/insights/FinancialOverviewCards';
 import { IncomeExpenseChart } from '@/components/insights/IncomeExpenseChart';
 import { SpendingBreakdownChart } from '@/components/insights/SpendingBreakdownChart';
-import { CategorySpendingList } from '@/components/insights/CategorySpendingList';
 import { SpendingTrendsChart } from '@/components/insights/SpendingTrendsChart';
 import { FinancialInsightCard } from '@/components/insights/FinancialInsightCard';
 import { BudgetPerformanceCard } from '@/components/insights/BudgetPerformanceCard';
@@ -109,16 +108,10 @@ export default function InsightsScreen() {
             {/* 4. Income vs. Expenses Chart */}
             <IncomeExpenseChart buckets={analytics.incomeExpenseBuckets} />
 
-            {/* 5. Spending Breakdown (Donut Chart + Category List) */}
+            {/* 5. Spending Breakdown (Donut Chart + Integrated Ranked Categories) */}
             <SpendingBreakdownChart
               categories={analytics.categorySpending}
               totalExpenses={analytics.overview.totalExpenses}
-              selectedCategoryId={selectedCategoryId}
-              onSelectCategory={setSelectedCategoryId}
-            />
-
-            <CategorySpendingList
-              categories={analytics.categorySpending}
               selectedCategoryId={selectedCategoryId}
               onSelectCategory={setSelectedCategoryId}
             />

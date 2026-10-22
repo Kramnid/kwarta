@@ -4,6 +4,7 @@ import Svg, { Circle, G } from 'react-native-svg';
 import { PieChart, Sparkles } from 'lucide-react-native';
 import { CategorySpending } from '@/types/finance';
 import { formatCentavosToPhp } from '@/utils/currency';
+import { CategoryIcon } from '@/components/transactions/CategoryIcon';
 
 interface SpendingBreakdownChartProps {
   categories: CategorySpending[];
@@ -39,8 +40,8 @@ export function SpendingBreakdownChart({
   selectedCategoryId,
   onSelectCategory,
 }: SpendingBreakdownChartProps) {
-  const chartSize = 220;
-  const strokeWidth = 26;
+  const chartSize = 210;
+  const strokeWidth = 24;
   const radius = (chartSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = chartSize / 2;
@@ -98,17 +99,17 @@ export function SpendingBreakdownChart({
         {selectedCategoryId && (
           <TouchableOpacity
             onPress={() => onSelectCategory(null)}
-            className="bg-slate-800 px-2 py-1 rounded-lg"
+            className="bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700/60"
           >
-            <Text className="text-slate-400 text-[10px] font-semibold">
-              Reset View
+            <Text className="text-slate-300 text-[11px] font-semibold">
+              Show All
             </Text>
           </TouchableOpacity>
         )}
       </View>
 
       {/* Donut Chart with Center Text */}
-      <View className="items-center justify-center my-2">
+      <View className="items-center justify-center my-1">
         <View style={{ width: chartSize, height: chartSize }} className="relative items-center justify-center">
           <Svg width={chartSize} height={chartSize}>
             <G rotation="-90" origin={`${center}, ${center}`}>
@@ -161,7 +162,7 @@ export function SpendingBreakdownChart({
               bottom: 0,
               alignItems: 'center',
               justifyContent: 'center',
-              paddingHorizontal: strokeWidth + 6,
+              paddingHorizontal: strokeWidth + 4,
             }}
           >
             {activeCategory ? (
@@ -175,6 +176,7 @@ export function SpendingBreakdownChart({
                 <Text
                   numberOfLines={1}
                   adjustsFontSizeToFit
+                  minimumFontScale={0.7}
                   className="text-white font-extrabold text-base mt-0.5 text-center"
                 >
                   {formatCentavosToPhp(activeCategory.amount)}
@@ -194,6 +196,7 @@ export function SpendingBreakdownChart({
                 <Text
                   numberOfLines={1}
                   adjustsFontSizeToFit
+                  minimumFontScale={0.7}
                   className="text-white font-extrabold text-base mt-0.5 text-center"
                 >
                   {formatCentavosToPhp(totalExpenses)}
@@ -207,9 +210,91 @@ export function SpendingBreakdownChart({
         </View>
       </View>
 
-      <Text className="text-slate-400 text-[10px] text-center mt-2">
-        Tap any category in the list below to focus its share.
+      <Text className="text-slate-400 text-[10px] text-center my-2">
+        Tap any category below to isolate its share.
       </Text>
+
+      {/* Integrated Sorted Category List */}
+      <View className="mt-2 pt-3 border-t border-slate-700/50">
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-slate-300 font-bold text-xs uppercase tracking-wider">
+            Ranked Categories
+          </Text>
+          <Text className="text-slate-400 text-[11px]">
+            Highest to Lowest
+          </Text>
+        </View>
+
+        <View className="gap-2.5">
+          {categories.map((item) => {
+            const isSelected = selectedCategoryId === item.categoryId;
+            const color = item.categoryColor || '#10B981';
+
+            return (
+              <TouchableOpacity
+                key={`cat-item-${item.categoryId}`}
+                onPress={() =>
+                  onSelectCategory(isSelected ? null : item.categoryId)
+                }
+                activeOpacity={0.7}
+                style={{
+                  backgroundColor: isSelected ? '#1E293B' : 'transparent',
+                }}
+                className="p-2 -mx-1 rounded-xl transition-all"
+              >
+                {/* Row: Icon, Name, Amount, Percentage */}
+                <View className="flex-row items-center justify-between mb-1.5">
+                  <View className="flex-row items-center flex-1 mr-2">
+                    <View
+                      style={{
+                        backgroundColor: `${color}20`,
+                        borderColor: `${color}40`,
+                      }}
+                      className="w-7 h-7 rounded-lg items-center justify-center border mr-2.5"
+                    >
+                      <CategoryIcon
+                        name={item.categoryIcon}
+                        color={color}
+                        size={14}
+                      />
+                    </View>
+                    <Text
+                      numberOfLines={1}
+                      className="text-slate-200 text-xs font-semibold flex-1"
+                    >
+                      {item.categoryName}
+                    </Text>
+                  </View>
+
+                  <View className="flex-row items-center">
+                    <Text className="text-white text-xs font-bold mr-2">
+                      {formatCentavosToPhp(item.amount)}
+                    </Text>
+                    <Text
+                      style={{ color: isSelected ? color : '#94A3B8' }}
+                      className="text-xs font-bold w-12 text-right"
+                    >
+                      {item.percentage.toFixed(1)}%
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Progress Bar */}
+                <View className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <View
+                    style={{
+                      width: `${Math.min(Math.max(item.percentage, 0), 100)}%`,
+                      minWidth: 6,
+                      backgroundColor: color,
+                    }}
+                    className="h-full rounded-full"
+                  />
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
     </View>
   );
 }
