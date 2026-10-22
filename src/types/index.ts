@@ -5,7 +5,7 @@
 export * from './finance';
 
 export interface Category {
-  id: number;
+  id: string | number;
   name: string;
   icon: string;
   color: string;
@@ -15,8 +15,8 @@ export interface Category {
 }
 
 export interface Budget {
-  id: number;
-  category_id: number;
+  id: string | number;
+  category_id: string | number;
   amount_limit: number; // Stored in integer centavos
   period: 'weekly' | 'monthly' | 'yearly';
   start_date: string;
@@ -25,7 +25,7 @@ export interface Budget {
 }
 
 export interface SavingsGoal {
-  id: number;
+  id: string | number;
   title: string;
   target_amount: number; // Stored in integer centavos
   current_amount: number; // Stored in integer centavos

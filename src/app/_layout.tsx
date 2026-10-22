@@ -62,11 +62,16 @@ export default function RootLayout() {
             name="add-transaction"
             options={{
               presentation: 'modal',
-              headerTitle: 'Add Transaction',
-              headerStyle: {
-                backgroundColor: '#151F30',
-              },
-              headerTintColor: '#F8FAFC',
+              headerShown: false,
+            }}
+          />
+
+          {/* Edit Transaction Modal */}
+          <Stack.Screen
+            name="transaction/[id]"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
             }}
           />
         </Stack>

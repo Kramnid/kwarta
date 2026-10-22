@@ -1,44 +1,80 @@
 /**
- * Global App State Management with Zustand
- * Supports both real SQLite transactions and an isolated Demo Mode.
+ * Global State Management with Zustand for Kwarta
+ * Connects SQLite persistent transactions directly to reactive application state.
  */
 
 import { create } from 'zustand';
-import { Transaction } from '@/types/finance';
+import {
+  Transaction,
+  TransactionCategory,
+  CreateTransactionInput,
+  TransactionFilters,
+} from '@/types/finance';
 import { DEMO_TRANSACTIONS } from '@/constants/demoData';
-import { getDatabase } from '@/database';
+import {
+  getAllTransactions,
+  insertTransaction,
+  updateTransaction as dbUpdateTransaction,
+  deleteTransaction as dbDeleteTransaction,
+  getAllCategories,
+} from '@/database';
 
-interface AppState {
+interface FinanceState {
   // Database status
   isDatabaseReady: boolean;
   setDatabaseReady: (ready: boolean) => void;
   dbError: string | null;
   setDbError: (error: string | null) => void;
 
-  // Demo mode vs Real data mode
+  // Demo mode (Default is FALSE: production connects to real SQLite records)
   isDemoMode: boolean;
   setDemoMode: (enabled: boolean) => void;
   toggleDemoMode: () => void;
 
-  // Transactions data
+  // Data collections
   transactions: Transaction[];
+  categories: TransactionCategory[];
   isLoadingTransactions: boolean;
+  isLoadingCategories: boolean;
+
+  // Filter and search state for Transactions screen
+  filters: TransactionFilters;
+  setFilters: (filters: Partial<TransactionFilters>) => void;
+  resetFilters: () => void;
+
+  // CRUD actions
   refreshTransactions: () => Promise<void>;
+  refreshCategories: () => Promise<void>;
+  addTransaction: (input: CreateTransactionInput) => Promise<Transaction>;
+  editTransaction: (
+    id: string,
+    input: Partial<CreateTransactionInput>
+  ) => Promise<Transaction>;
+  removeTransaction: (id: string) => Promise<boolean>;
 }
 
-export const useAppStore = create<AppState>((set, get) => ({
+const DEFAULT_FILTERS: TransactionFilters = {
+  searchQuery: '',
+  type: 'all',
+  categoryId: 'all',
+  dateFilter: 'all',
+  sortBy: 'date_desc',
+};
+
+export const useAppStore = create<FinanceState>((set, get) => ({
   isDatabaseReady: false,
   setDatabaseReady: (ready: boolean) => {
     set({ isDatabaseReady: ready });
     if (ready) {
+      get().refreshCategories();
       get().refreshTransactions();
     }
   },
   dbError: null,
   setDbError: (error: string | null) => set({ dbError: error }),
 
-  // Default to demo mode if no transactions have been entered yet
-  isDemoMode: true,
+  // Default is false: Step 3 connects to real SQLite transactions!
+  isDemoMode: false,
   setDemoMode: (enabled: boolean) => {
     set({ isDemoMode: enabled });
     get().refreshTransactions();
@@ -49,19 +85,46 @@ export const useAppStore = create<AppState>((set, get) => ({
     get().refreshTransactions();
   },
 
-  transactions: DEMO_TRANSACTIONS,
+  transactions: [],
+  categories: [],
   isLoadingTransactions: false,
+  isLoadingCategories: false,
+
+  filters: DEFAULT_FILTERS,
+  setFilters: (partial) => {
+    set({
+      filters: {
+        ...get().filters,
+        ...partial,
+      },
+    });
+  },
+  resetFilters: () => {
+    set({ filters: DEFAULT_FILTERS });
+  },
+
+  refreshCategories: async () => {
+    const { isDatabaseReady } = get();
+    if (!isDatabaseReady) return;
+
+    try {
+      set({ isLoadingCategories: true });
+      const cats = await getAllCategories();
+      set({ categories: cats, isLoadingCategories: false });
+    } catch (error) {
+      console.warn('[Kwarta Store] Failed to load categories:', error);
+      set({ isLoadingCategories: false });
+    }
+  },
 
   refreshTransactions: async () => {
     const { isDemoMode, isDatabaseReady } = get();
 
-    // In demo mode, load centralized demo transactions
     if (isDemoMode) {
       set({ transactions: DEMO_TRANSACTIONS, isLoadingTransactions: false });
       return;
     }
 
-    // In real mode, query SQLite database
     if (!isDatabaseReady) {
       set({ transactions: [] });
       return;
@@ -69,41 +132,53 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     try {
       set({ isLoadingTransactions: true });
-      const db = getDatabase();
-      const rows = await db.getAllAsync<Transaction>(
-        `SELECT t.*, c.name as category_name, c.icon as category_icon, c.color as category_color
-         FROM transactions t
-         LEFT JOIN categories c ON t.category_id = c.id
-         ORDER BY t.date DESC, t.id DESC;`
-      );
-
-      // Map joined fields into category object
-      const mappedTransactions: Transaction[] = (rows || []).map((row: any) => ({
-        id: row.id,
-        amount: row.amount,
-        type: row.type,
-        category_id: row.category_id,
-        description: row.description,
-        date: row.date,
-        payment_method: row.payment_method,
-        is_recurring: row.is_recurring,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-        category: row.category_name
-          ? {
-              id: row.category_id,
-              name: row.category_name,
-              icon: row.category_icon || 'more-horizontal',
-              color: row.category_color || '#94A3B8',
-              type: row.type,
-            }
-          : undefined,
-      }));
-
-      set({ transactions: mappedTransactions, isLoadingTransactions: false });
+      const txs = await getAllTransactions();
+      set({ transactions: txs, isLoadingTransactions: false });
     } catch (error) {
-      console.warn('[Kwarta Store] Failed to query transactions from SQLite:', error);
+      console.warn('[Kwarta Store] Failed to load transactions:', error);
       set({ transactions: [], isLoadingTransactions: false });
     }
   },
+
+  addTransaction: async (input: CreateTransactionInput) => {
+    const { isDatabaseReady } = get();
+    if (!isDatabaseReady) {
+      throw new Error('Database is not initialized.');
+    }
+
+    const created = await insertTransaction(input);
+    // Refresh the in-memory state so dashboard and all screens react immediately
+    await get().refreshTransactions();
+    return created;
+  },
+
+  editTransaction: async (
+    id: string,
+    input: Partial<CreateTransactionInput>
+  ) => {
+    const { isDatabaseReady } = get();
+    if (!isDatabaseReady) {
+      throw new Error('Database is not initialized.');
+    }
+
+    const updated = await dbUpdateTransaction(id, input);
+    await get().refreshTransactions();
+    return updated;
+  },
+
+  removeTransaction: async (id: string) => {
+    const { isDatabaseReady } = get();
+    if (!isDatabaseReady) {
+      throw new Error('Database is not initialized.');
+    }
+
+    const success = await dbDeleteTransaction(id);
+    if (success) {
+      await get().refreshTransactions();
+    }
+    return success;
+  },
 }));
+
+// Export alias for architectures looking for useFinanceStore
+export const useFinanceStore = useAppStore;

@@ -1,9 +1,8 @@
 /**
  * Financial Domain Types for Kwarta
  *
- * NOTE: All monetary amounts (amount, balance, income, expense, limit, target)
- * are represented as integer centavos (e.g. ₱12,500.00 = 1250000 centavos)
- * to prevent floating-point precision issues.
+ * All monetary amounts are stored as integer centavos (e.g. ₱125.50 = 12550 centavos)
+ * to eliminate floating-point precision errors.
  */
 
 export type TransactionType = 'income' | 'expense';
@@ -11,27 +10,67 @@ export type TransactionType = 'income' | 'expense';
 export type BudgetPeriod = 'weekly' | 'monthly' | 'yearly';
 
 export interface TransactionCategory {
-  id: number;
+  id: string; // Stable text ID (e.g. 'cat_exp_food_drinks')
   name: string;
-  icon: string;
-  color: string;
+  icon: string; // Lucide icon identifier string
+  color: string; // Hex color string
   type: TransactionType;
-  is_default?: number;
+  is_default: number;
   created_at?: string;
 }
 
 export interface Transaction {
-  id: number;
-  amount: number; // Stored in integer centavos (e.g., ₱2,500.00 = 250000)
+  id: string; // Text primary key (e.g. 'tx_1729600000_abc')
   type: TransactionType;
-  category_id: number;
+  amount_centavos: number; // Positive integer centavos
+  category_id: string;
+  title: string;
+  note?: string | null;
+  transaction_date: string; // ISO calendar date: YYYY-MM-DD
+  created_at: string;
+  updated_at: string;
   category?: TransactionCategory;
-  description?: string;
-  date: string; // ISO 8601 string (YYYY-MM-DD or ISO timestamp)
-  payment_method?: string;
-  is_recurring?: number;
-  created_at?: string;
-  updated_at?: string;
+
+  // Compatibility aliases for Step 2 presentation code
+  amount?: number; // centavos alias for amount_centavos
+  description?: string; // alias for title
+  date?: string; // alias for transaction_date
+}
+
+export interface CreateTransactionInput {
+  type: TransactionType;
+  amount_centavos: number;
+  category_id: string;
+  title: string;
+  note?: string | null;
+  transaction_date: string; // YYYY-MM-DD
+}
+
+export interface UpdateTransactionInput extends Partial<CreateTransactionInput> {
+  id: string;
+}
+
+export type TransactionDateFilter =
+  | 'all'
+  | 'today'
+  | 'this_week'
+  | 'this_month'
+  | 'custom';
+
+export type TransactionSortOption =
+  | 'date_desc'
+  | 'date_asc'
+  | 'amount_desc'
+  | 'amount_asc';
+
+export interface TransactionFilters {
+  searchQuery?: string;
+  type?: 'all' | TransactionType;
+  categoryId?: string | 'all';
+  dateFilter?: TransactionDateFilter;
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
+  sortBy?: TransactionSortOption;
 }
 
 export interface DashboardSummary {
@@ -41,10 +80,18 @@ export interface DashboardSummary {
 }
 
 export interface CategorySpending {
-  categoryId: number;
+  categoryId: string;
   categoryName: string;
   categoryIcon: string;
   categoryColor: string;
   amount: number; // in integer centavos
   percentage: number; // 0 to 100
+}
+
+export interface DateGroupedTransactions {
+  date: string; // YYYY-MM-DD
+  title: string; // "Today", "Yesterday", or formatted date
+  transactions: Transaction[];
+  totalIncomeCentavos: number;
+  totalExpensesCentavos: number;
 }
