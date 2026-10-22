@@ -5,6 +5,8 @@ import {
   X,
   ArrowUpDown,
   Check,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import {
@@ -140,10 +142,26 @@ export function TransactionFilters({
               <Pressable
                 key={t}
                 onPress={() => handleTypeSelect(t)}
-                className={`flex-1 py-2 rounded-xl items-center justify-center ${
+                className={`flex-1 py-2 rounded-xl flex-row items-center justify-center ${
                   isSelected ? activeClass : ''
                 }`}
               >
+                {t === 'income' && (
+                  <ArrowUp
+                    size={11}
+                    color={isSelected ? '#10B981' : '#94A3B8'}
+                    strokeWidth={2.5}
+                    style={{ marginRight: 3 }}
+                  />
+                )}
+                {t === 'expense' && (
+                  <ArrowDown
+                    size={11}
+                    color={isSelected ? '#F87171' : '#94A3B8'}
+                    strokeWidth={2.5}
+                    style={{ marginRight: 3 }}
+                  />
+                )}
                 <Text
                   className={`text-xs ${
                     isSelected ? textActiveClass : 'text-slate-400 font-medium'

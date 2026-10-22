@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import {
-  TrendingUp,
-  TrendingDown,
+  ArrowUp,
+  ArrowDown,
   Scale,
   Percent,
   CalendarDays,
@@ -53,7 +53,7 @@ export function FinancialOverviewCards({
               Total Income
             </Text>
             <View className="w-6 h-6 rounded-full bg-emerald-500/10 items-center justify-center">
-              <TrendingUp size={13} color="#10B981" />
+              <ArrowUp size={13} color="#10B981" strokeWidth={2.5} />
             </View>
           </View>
           <Text
@@ -76,7 +76,7 @@ export function FinancialOverviewCards({
               Total Expenses
             </Text>
             <View className="w-6 h-6 rounded-full bg-rose-500/10 items-center justify-center">
-              <TrendingDown size={13} color="#F87171" />
+              <ArrowDown size={13} color="#F87171" strokeWidth={2.5} />
             </View>
           </View>
           <Text

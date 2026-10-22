@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-react-native';
+import { ArrowDown, ArrowUp } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { TransactionType } from '@/types/finance';
 
@@ -70,7 +70,7 @@ export function TransactionTypeSelector({
             marginRight: 8,
           }}
         >
-          <ArrowDownLeft
+          <ArrowDown
             size={15}
             color={isExpense ? '#0B1220' : '#94A3B8'}
             strokeWidth={2.5}
@@ -115,7 +115,7 @@ export function TransactionTypeSelector({
             marginRight: 8,
           }}
         >
-          <ArrowUpRight
+          <ArrowUp
             size={15}
             color={isIncome ? '#0B1220' : '#94A3B8'}
             strokeWidth={2.5}
