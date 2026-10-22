@@ -5,7 +5,6 @@ import { formatCentavosToPhp } from '@/utils/currency';
 import { formatTransactionDate } from '@/utils/date';
 import { getEffectiveAmount, getEffectiveDate } from '@/utils/finance';
 import { CategoryIcon } from '@/components/transactions/CategoryIcon';
-import { useAppStore } from '@/store';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -18,7 +17,6 @@ export function TransactionItem({
   onPress,
   showDivider = true,
 }: TransactionItemProps) {
-  const { isBalanceHidden } = useAppStore();
   const isIncome = transaction.type === 'income';
   const category = transaction.category;
   const categoryColor = category?.color || (isIncome ? '#10B981' : '#F87171');
@@ -76,13 +74,7 @@ export function TransactionItem({
               isIncome ? 'text-emerald-400' : 'text-slate-100'
             }`}
           >
-            {isBalanceHidden
-              ? isIncome
-                ? '+₱ ••••'
-                : '-₱ ••••'
-              : isIncome
-              ? `+${formattedAmount}`
-              : `-${formattedAmount}`}
+            {isIncome ? `+${formattedAmount}` : `-${formattedAmount}`}
           </Text>
           {transaction.note ? (
             <Text

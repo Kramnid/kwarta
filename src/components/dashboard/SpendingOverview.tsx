@@ -6,7 +6,6 @@ import { CategorySpending } from '@/types/finance';
 import { formatCentavosToPhp } from '@/utils/currency';
 import { formatCurrentMonth } from '@/utils/date';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { useAppStore } from '@/store';
 
 interface SpendingOverviewProps {
   categories: CategorySpending[];
@@ -20,7 +19,6 @@ export function SpendingOverview({
   className = '',
 }: SpendingOverviewProps) {
   const router = useRouter();
-  const { isBalanceHidden } = useAppStore();
   const currentMonth = formatCurrentMonth();
   const formattedTotal = formatCentavosToPhp(totalExpensesCentavos);
 
@@ -62,7 +60,7 @@ export function SpendingOverview({
           <View className="items-end">
             <Text className="text-slate-400 text-[11px] font-medium">Total Spent</Text>
             <Text className="text-rose-400 text-xl font-extrabold tracking-tight mt-0.5">
-              {isBalanceHidden ? '₱ ••••••' : formattedTotal}
+              {formattedTotal}
             </Text>
           </View>
         </View>
@@ -114,7 +112,7 @@ export function SpendingOverview({
 
                     <View className="flex-row items-center">
                       <Text className="text-white text-xs font-bold mr-2">
-                        {isBalanceHidden ? '₱ •••' : formattedCategoryAmount}
+                        {formattedCategoryAmount}
                       </Text>
                       <View className="bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-700/50">
                         <Text className="text-slate-300 text-[10px] font-bold">

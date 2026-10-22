@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react-native';
 import { splitCentavosToPhp } from '@/utils/currency';
-import { useAppStore } from '@/store';
 
 interface SummaryCardProps {
   incomeCentavos: number;
@@ -15,7 +14,6 @@ export function SummaryCard({
   expenseCentavos,
   className = '',
 }: SummaryCardProps) {
-  const { isBalanceHidden } = useAppStore();
   const income = splitCentavosToPhp(incomeCentavos);
   const expense = splitCentavosToPhp(expenseCentavos);
 
@@ -37,7 +35,7 @@ export function SummaryCard({
           adjustsFontSizeToFit
           className="text-emerald-400 text-lg font-black tracking-tight"
         >
-          {isBalanceHidden ? '₱ ••••••' : `+${income.symbol} ${income.formattedAmount}`}
+          {`+${income.symbol} ${income.formattedAmount}`}
         </Text>
         <Text className="text-slate-400 text-[11px] mt-0.5">
           Total received
@@ -60,7 +58,7 @@ export function SummaryCard({
           adjustsFontSizeToFit
           className="text-rose-400 text-lg font-black tracking-tight"
         >
-          {isBalanceHidden ? '₱ ••••••' : `-${expense.symbol} ${expense.formattedAmount}`}
+          {`-${expense.symbol} ${expense.formattedAmount}`}
         </Text>
         <Text className="text-slate-400 text-[11px] mt-0.5">
           Total spent
