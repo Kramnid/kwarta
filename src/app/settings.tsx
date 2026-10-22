@@ -9,8 +9,6 @@ import {
   Database,
   Moon,
   Sparkles,
-  PiggyBank,
-  ChevronRight,
   ArrowLeft,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -26,13 +24,6 @@ export default function SettingsScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {}
     router.back();
-  };
-
-  const handleSavingsNavigation = () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
-    router.push('/(tabs)/savings' as any);
   };
 
   return (
@@ -73,32 +64,6 @@ export default function SettingsScreen() {
             Kwarta v1.0.0 • Every peso counts.
           </Text>
         </View>
-
-        {/* Savings Goals Quick Shortcut */}
-        <Pressable
-          onPress={handleSavingsNavigation}
-          className="active:opacity-80 mb-4"
-          accessibilityRole="button"
-          accessibilityLabel="Go to Savings Goals"
-        >
-          <Card className="border border-emerald-500/30">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center flex-1 mr-3">
-                <View className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center mr-3">
-                  <PiggyBank size={20} color="#10B981" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-white text-sm font-bold">Savings Goals</Text>
-                  <Text className="text-slate-400 text-xs mt-0.5">
-                    Track progress, targets, and milestones
-                  </Text>
-                </View>
-              </View>
-
-              <ChevronRight size={18} color="#10B981" />
-            </View>
-          </Card>
-        </Pressable>
 
         {/* Demo Mode Toggle Card */}
         <Card className="mb-4">

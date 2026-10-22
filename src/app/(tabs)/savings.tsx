@@ -5,6 +5,7 @@ import {
   ScrollView,
   Pressable,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -33,6 +34,8 @@ export default function SavingsTabScreen() {
     () => calculateSavingsSummary(savingsGoals),
     [savingsGoals]
   );
+
+  const hasGoals = savingsGoals.length > 0;
 
   const filteredGoals = useMemo(() => {
     if (activeFilter === 'all') {
@@ -101,11 +104,15 @@ export default function SavingsTabScreen() {
               <Text className="text-slate-400 text-xs font-semibold tracking-wider uppercase">
                 SAVINGS & TARGETS
               </Text>
-              <Text className="text-slate-600 text-xs mx-1.5">•</Text>
-              <Text className="text-emerald-400 text-xs font-medium">
-                {summary.activeGoalsCount}{' '}
-                {summary.activeGoalsCount === 1 ? 'Active Goal' : 'Active Goals'}
-              </Text>
+              {hasGoals && (
+                <>
+                  <Text className="text-slate-600 text-xs mx-1.5">•</Text>
+                  <Text className="text-emerald-400 text-xs font-medium">
+                    {summary.activeGoalsCount}{' '}
+                    {summary.activeGoalsCount === 1 ? 'Active Goal' : 'Active Goals'}
+                  </Text>
+                </>
+              )}
             </View>
 
             <Text className="text-white text-[26px] font-extrabold tracking-tight mt-0.5">
@@ -116,65 +123,87 @@ export default function SavingsTabScreen() {
             </Text>
           </View>
 
-          <Button
-            title="Add"
-            size="sm"
-            onPress={handleCreate}
-            leftIcon={<Plus size={15} color="#FFFFFF" strokeWidth={2.5} />}
-          />
+          {/* Quick Add Button in header: only visible when goals already exist */}
+          {hasGoals && (
+            <Button
+              title="Add"
+              size="sm"
+              onPress={handleCreate}
+              leftIcon={<Plus size={15} color="#FFFFFF" strokeWidth={2.5} />}
+            />
+          )}
         </View>
 
-        {/* 2. Summary Card */}
-        <SavingsSummaryCard summary={summary} className="mb-4" />
-
-        {/* 3. Filter Chips */}
-        <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/60 mb-5">
-          {filterTabs.map((tab) => {
-            const isSelected = activeFilter === tab.id;
-
-            return (
-              <Pressable
-                key={tab.id}
-                onPress={() => handleFilterSelect(tab.id)}
-                className={`flex-1 py-2 rounded-xl items-center justify-center flex-row ${
-                  isSelected
-                    ? 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm'
-                    : ''
-                }`}
-                accessibilityRole="button"
-                accessibilityLabel={`Filter ${tab.label}`}
-              >
-                <Text
-                  className={`text-xs ${
-                    isSelected ? 'text-emerald-400 font-bold' : 'text-slate-400 font-medium'
-                  }`}
-                >
-                  {tab.label}
-                </Text>
-                {tab.count !== undefined && tab.count > 0 ? (
-                  <Text
-                    className={`text-[10px] ml-1 px-1.5 py-0.2 rounded-full ${
-                      isSelected
-                        ? 'bg-emerald-500/30 text-emerald-300 font-bold'
-                        : 'bg-slate-800 text-slate-400'
-                    }`}
-                  >
-                    {tab.count}
-                  </Text>
-                ) : null}
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* 4. Goals List or Empty State */}
-        {filteredGoals.length === 0 ? (
-          <SavingsEmptyState filterStatus={activeFilter} />
+        {/* Loading Indicator for first load */}
+        {isLoadingSavings && savingsGoals.length === 0 ? (
+          <View className="py-20 items-center justify-center">
+            <ActivityIndicator size="large" color="#10B981" />
+            <Text className="text-slate-400 text-xs mt-3">
+              Loading savings goals...
+            </Text>
+          </View>
+        ) : !hasGoals ? (
+          /* 2. Global Zero State (First time / empty state) */
+          <SavingsEmptyState filterStatus="all" className="mt-2" />
         ) : (
-          <View className="gap-3.5">
-            {filteredGoals.map((goal) => (
-              <SavingsGoalCard key={goal.id} goal={goal} />
-            ))}
+          /* 3. Populated Content State */
+          <View>
+            {/* Summary Card */}
+            <SavingsSummaryCard summary={summary} className="mb-4" />
+
+            {/* Filter Segmented Control */}
+            <View className="flex-row bg-[#151F30] p-1 rounded-2xl border border-slate-700/60 mb-5">
+              {filterTabs.map((tab) => {
+                const isSelected = activeFilter === tab.id;
+
+                return (
+                  <Pressable
+                    key={tab.id}
+                    onPress={() => handleFilterSelect(tab.id)}
+                    className={`flex-1 py-2 rounded-xl items-center justify-center flex-row ${
+                      isSelected
+                        ? 'bg-emerald-500/20 border border-emerald-500/40 shadow-sm'
+                        : ''
+                    }`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Filter ${tab.label}`}
+                  >
+                    <Text
+                      className={`text-xs ${
+                        isSelected ? 'text-emerald-400 font-bold' : 'text-slate-400 font-medium'
+                      }`}
+                    >
+                      {tab.label}
+                    </Text>
+                    {tab.count !== undefined && tab.count > 0 ? (
+                      <Text
+                        className={`text-[10px] ml-1 px-1.5 py-0.2 rounded-full ${
+                          isSelected
+                            ? 'bg-emerald-500/30 text-emerald-300 font-bold'
+                            : 'bg-slate-800 text-slate-400'
+                        }`}
+                      >
+                        {tab.count}
+                      </Text>
+                    ) : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {/* Filtered Goals List or Filtered Empty State */}
+            {filteredGoals.length === 0 ? (
+              <SavingsEmptyState
+                filterStatus={activeFilter}
+                onClearFilter={() => setActiveFilter('all')}
+              />
+            ) : (
+              <View className="gap-3.5">
+                {filteredGoals.map((goal) => (
+                  <SavingsGoalCard key={goal.id} goal={goal} />
+                ))}
+              </View>
+            )}
           </View>
         )}
       </ScrollView>

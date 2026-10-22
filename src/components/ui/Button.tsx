@@ -93,6 +93,7 @@ export function Button({
         <>
           {leftIcon && <>{leftIcon}</>}
           <Text
+            numberOfLines={1}
             className={`${textClass} ${textSizeClass} ${leftIcon ? 'ml-2' : ''} ${rightIcon ? 'mr-2' : ''}`}
             style={textStyle}
           >
