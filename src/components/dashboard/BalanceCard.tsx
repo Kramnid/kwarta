@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { ShieldCheck, TrendingUp, TrendingDown, Eye, EyeOff } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { splitCentavosToPhp } from '@/utils/currency';
@@ -34,22 +33,24 @@ export function BalanceCard({
 
   return (
     <View
-      className={`rounded-2xl overflow-hidden border border-slate-700/70 shadow-lg ${className}`}
+      className={`rounded-2xl overflow-hidden border border-slate-700/80 bg-[#151F30] shadow-lg ${className}`}
     >
       {/* Top emerald signature accent strip */}
       <View className="h-[3px] bg-emerald-500 w-full" />
 
-      <LinearGradient
-        colors={['#172338', '#151F30', '#121A28']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      {/* Main card body with guaranteed style padding for 100% cross-platform reliability */}
+      <View
         className="p-5"
+        style={{
+          paddingHorizontal: 20,
+          paddingVertical: 20,
+        }}
       >
         {/* Top Header Row: Label & Privacy Eye Toggle */}
-        <View className="flex-row items-center justify-between mb-2">
+        <View className="flex-row items-center justify-between mb-3">
           <View className="flex-row items-center">
-            <View className="w-2 h-2 rounded-full bg-emerald-400 mr-2 shadow-sm shadow-emerald-400" />
-            <Text className="text-slate-400 text-xs font-bold tracking-wider uppercase">
+            <View className="w-2.5 h-2.5 rounded-full bg-emerald-400 mr-2 shadow-sm shadow-emerald-400" />
+            <Text className="text-slate-300 text-xs font-bold tracking-wider uppercase">
               Total Balance
             </Text>
           </View>
@@ -57,24 +58,24 @@ export function BalanceCard({
           {/* Privacy Eye Toggle Button */}
           <Pressable
             onPress={handleTogglePrivacy}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             accessibilityRole="button"
             accessibilityLabel={isBalanceHidden ? 'Show balance' : 'Hide balance'}
-            className="flex-row items-center bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-full active:bg-slate-700"
+            className="flex-row items-center bg-slate-800 border border-slate-600 px-3 py-1.5 rounded-full active:bg-slate-700"
           >
             {isBalanceHidden ? (
-              <EyeOff size={13} color="#94A3B8" />
+              <EyeOff size={13} color="#E2E8F0" />
             ) : (
-              <Eye size={13} color="#94A3B8" />
+              <Eye size={13} color="#E2E8F0" />
             )}
-            <Text className="text-slate-300 text-xs font-medium ml-1.5">
+            <Text className="text-slate-200 text-xs font-semibold ml-1.5">
               {isBalanceHidden ? 'Show' : 'Hide'}
             </Text>
           </Pressable>
         </View>
 
-        {/* Main Balance Display: Unified Single Text for Perfect Baseline */}
-        <View className="my-2.5">
+        {/* Main Balance Display: High Contrast Crisp White Text */}
+        <View className="my-2">
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
@@ -86,27 +87,27 @@ export function BalanceCard({
           </Text>
         </View>
 
-        {/* Bottom Row: Cash status & Privacy badge */}
-        <View className="flex-row items-center justify-between pt-3 border-t border-slate-700/50 mt-1">
+        {/* Bottom Row: Cash status & Privacy badge with crisp readable colors */}
+        <View className="flex-row items-center justify-between pt-3.5 border-t border-slate-700/80 mt-1">
           <View className="flex-row items-center">
             {isPositive ? (
-              <TrendingUp size={14} color="#10B981" />
+              <TrendingUp size={15} color="#34D399" />
             ) : (
-              <TrendingDown size={14} color="#F87171" />
+              <TrendingDown size={15} color="#F87171" />
             )}
-            <Text className="text-slate-300 text-xs font-medium ml-1.5">
+            <Text className="text-slate-200 text-xs font-medium ml-1.5">
               {isPositive ? 'Available cash balance' : 'Deficit balance'}
             </Text>
           </View>
 
-          <View className="flex-row items-center bg-slate-800/80 border border-slate-700/60 px-2.5 py-0.5 rounded-full">
-            <ShieldCheck size={12} color="#10B981" />
-            <Text className="text-emerald-400 text-[11px] font-semibold ml-1">
+          <View className="flex-row items-center bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+            <ShieldCheck size={13} color="#34D399" />
+            <Text className="text-emerald-300 text-[11px] font-semibold ml-1">
               Private & Safe
             </Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
     </View>
   );
 }

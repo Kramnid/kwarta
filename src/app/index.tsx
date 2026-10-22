@@ -49,9 +49,10 @@ export default function WelcomeScreen() {
 
           {/* Sample Balance Card */}
           <View className="my-8">
-            <View className="bg-[#151F30] rounded-3xl p-6 border border-slate-700/60 shadow-xl relative overflow-hidden">
-              {/* Subtle accent glow */}
-              <View className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl" />
+            <View
+              className="bg-[#151F30] rounded-3xl p-6 border border-slate-700/60 shadow-xl overflow-hidden"
+              style={{ padding: 24 }}
+            >
 
               {/* Badge identifying sample / demo data */}
               <View className="flex-row items-center justify-between mb-4">
