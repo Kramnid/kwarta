@@ -1,15 +1,11 @@
 /**
  * Centralized SQLite Database Initialization and Management
- * Uses Expo SQLite (modern async/sync API) with WAL mode and foreign-key constraints.
+ * Uses Expo SQLite with WAL mode, foreign-key constraints, and versioned migrations.
  */
 
 import * as SQLite from 'expo-sqlite';
-import {
-  DATABASE_NAME,
-  CURRENT_SCHEMA_VERSION,
-  CREATE_TABLES_SQL,
-  DEFAULT_CATEGORIES,
-} from './schema';
+import { DATABASE_NAME, CURRENT_SCHEMA_VERSION } from './schema';
+import { runMigrations } from './migrations';
 import { DatabaseInitResult } from '@/types';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
@@ -32,49 +28,7 @@ export function getDatabase(): SQLite.SQLiteDatabase {
 export async function initDatabase(): Promise<DatabaseInitResult> {
   try {
     const db = getDatabase();
-
-    // 1. Enable WAL journal mode and enforce foreign keys
-    await db.execAsync(`
-      PRAGMA journal_mode = WAL;
-      PRAGMA foreign_keys = ON;
-    `);
-
-    // 2. Check current schema version
-    const versionRow = await db.getFirstAsync<{ user_version: number }>(
-      'PRAGMA user_version;'
-    );
-    const currentVersion = versionRow?.user_version ?? 0;
-
-    // 3. Perform version migrations
-    if (currentVersion < CURRENT_SCHEMA_VERSION) {
-      // Version 0 -> 1: Create initial tables and seed categories
-      if (currentVersion === 0) {
-        await db.execAsync(CREATE_TABLES_SQL);
-
-        // Seed default categories if table is currently empty
-        const countRow = await db.getFirstAsync<{ count: number }>(
-          'SELECT COUNT(*) as count FROM categories;'
-        );
-
-        if ((countRow?.count ?? 0) === 0) {
-          for (const category of DEFAULT_CATEGORIES) {
-            await db.runAsync(
-              'INSERT INTO categories (name, icon, color, type, is_default) VALUES (?, ?, ?, ?, ?);',
-              [
-                category.name,
-                category.icon,
-                category.color,
-                category.type,
-                category.is_default,
-              ]
-            );
-          }
-        }
-
-        // Set user_version to current schema version
-        await db.execAsync(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION};`);
-      }
-    }
+    await runMigrations(db);
 
     return {
       success: true,
@@ -89,3 +43,8 @@ export async function initDatabase(): Promise<DatabaseInitResult> {
     };
   }
 }
+
+export * from './schema';
+export * from './migrations';
+export * from './categories';
+export * from './transactions';

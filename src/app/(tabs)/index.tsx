@@ -1,12 +1,16 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useAppStore } from '@/store';
 import {
   calculateDashboardSummary,
   calculateSpendingByCategory,
+  calculateTotalExpenses,
   getRecentTransactions,
+  getEffectiveDate,
 } from '@/utils/finance';
+import { isDateInThisMonth } from '@/utils/date';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { BalanceCard } from '@/components/dashboard/BalanceCard';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
@@ -15,20 +19,33 @@ import { SpendingOverview } from '@/components/dashboard/SpendingOverview';
 import { RecentTransactions } from '@/components/dashboard/RecentTransactions';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const { transactions, refreshTransactions, isLoadingTransactions } = useAppStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Pure financial calculations derived from transactions
+  // Overall financial summary
   const summary = useMemo(
     () => calculateDashboardSummary(transactions),
     [transactions]
   );
 
-  const categoriesSpending = useMemo(
-    () => calculateSpendingByCategory(transactions),
+  // Current calendar month spending overview
+  const currentMonthTransactions = useMemo(
+    () => transactions.filter((t) => isDateInThisMonth(getEffectiveDate(t))),
     [transactions]
   );
 
+  const monthlyExpenses = useMemo(
+    () => calculateTotalExpenses(currentMonthTransactions),
+    [currentMonthTransactions]
+  );
+
+  const categoriesSpending = useMemo(
+    () => calculateSpendingByCategory(currentMonthTransactions),
+    [currentMonthTransactions]
+  );
+
+  // 5 newest transactions
   const recentTransactions = useMemo(
     () => getRecentTransactions(transactions, 5),
     [transactions]
@@ -81,14 +98,22 @@ export default function HomeScreen() {
         {/* 4. Quick Actions (Add Expense, Add Income, View History) */}
         <QuickActions />
 
-        {/* 5. Spending Overview (Category Progress Bars, View Insights) */}
+        {/* 5. Spending Overview (Category Progress Bars for Current Month) */}
         <SpendingOverview
           categories={categoriesSpending}
-          totalExpensesCentavos={summary.totalExpenses}
+          totalExpensesCentavos={monthlyExpenses}
         />
 
-        {/* 6. Recent Transactions (Latest 5 Transactions or Empty State) */}
-        <RecentTransactions transactions={recentTransactions} />
+        {/* 6. Recent Transactions (Tap to edit/view, or Empty State) */}
+        <RecentTransactions
+          transactions={recentTransactions}
+          onTransactionPress={(tx) =>
+            router.push({
+              pathname: '/transaction/[id]',
+              params: { id: tx.id },
+            } as any)
+          }
+        />
       </ScrollView>
     </SafeAreaView>
   );
