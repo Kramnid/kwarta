@@ -5,6 +5,7 @@ import { formatCentavosToPhp } from '@/utils/currency';
 import { formatTransactionDate } from '@/utils/date';
 import { getEffectiveAmount, getEffectiveDate } from '@/utils/finance';
 import { CategoryIcon } from '@/components/transactions/CategoryIcon';
+import { useAppStore } from '@/store';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -17,6 +18,7 @@ export function TransactionItem({
   onPress,
   showDivider = true,
 }: TransactionItemProps) {
+  const { isBalanceHidden } = useAppStore();
   const isIncome = transaction.type === 'income';
   const category = transaction.category;
   const categoryColor = category?.color || (isIncome ? '#10B981' : '#F87171');
@@ -28,7 +30,7 @@ export function TransactionItem({
   return (
     <Pressable
       onPress={() => onPress?.(transaction)}
-      className="active:bg-slate-800/40 px-3 py-3 rounded-2xl transition-all"
+      className="active:bg-slate-800/60 px-3 py-3 rounded-2xl transition-all"
       accessibilityRole="button"
       accessibilityLabel={`${title}, ${formattedAmount}`}
     >
@@ -37,7 +39,7 @@ export function TransactionItem({
         <View className="flex-row items-center flex-1 mr-3">
           <View
             style={{ backgroundColor: `${categoryColor}1F` }}
-            className="w-11 h-11 rounded-2xl items-center justify-center border border-white/5 mr-3"
+            className="w-11 h-11 rounded-2xl items-center justify-center border border-white/10 mr-3 shadow-sm"
           >
             <CategoryIcon
               name={category?.icon}
@@ -74,7 +76,13 @@ export function TransactionItem({
               isIncome ? 'text-emerald-400' : 'text-slate-100'
             }`}
           >
-            {isIncome ? `+${formattedAmount}` : `-${formattedAmount}`}
+            {isBalanceHidden
+              ? isIncome
+                ? '+₱ ••••'
+                : '-₱ ••••'
+              : isIncome
+              ? `+${formattedAmount}`
+              : `-${formattedAmount}`}
           </Text>
           {transaction.note ? (
             <Text

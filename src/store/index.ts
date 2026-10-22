@@ -37,6 +37,11 @@ interface FinanceState {
   isLoadingTransactions: boolean;
   isLoadingCategories: boolean;
 
+  // Privacy mode (mask sensitive currency balances)
+  isBalanceHidden: boolean;
+  setBalanceHidden: (hidden: boolean) => void;
+  toggleBalanceHidden: () => void;
+
   // Filter and search state for Transactions screen
   filters: TransactionFilters;
   setFilters: (filters: Partial<TransactionFilters>) => void;
@@ -89,6 +94,10 @@ export const useAppStore = create<FinanceState>((set, get) => ({
   categories: [],
   isLoadingTransactions: false,
   isLoadingCategories: false,
+
+  isBalanceHidden: false,
+  setBalanceHidden: (hidden: boolean) => set({ isBalanceHidden: hidden }),
+  toggleBalanceHidden: () => set((state) => ({ isBalanceHidden: !state.isBalanceHidden })),
 
   filters: DEFAULT_FILTERS,
   setFilters: (partial) => {

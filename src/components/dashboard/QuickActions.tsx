@@ -14,7 +14,7 @@ export function QuickActions({ className = '' }: QuickActionsProps) {
 
   const handleAddExpense = () => {
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch {
       // Fallback
     }
@@ -26,7 +26,7 @@ export function QuickActions({ className = '' }: QuickActionsProps) {
 
   const handleAddIncome = () => {
     try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch {
       // Fallback
     }
@@ -55,13 +55,16 @@ export function QuickActions({ className = '' }: QuickActionsProps) {
           onPress={handleAddExpense}
           accessibilityRole="button"
           accessibilityLabel="Add Expense"
-          className="flex-1 bg-[#151F30] active:bg-slate-800 border border-slate-700/60 rounded-2xl py-3.5 px-2 items-center justify-center transition-all shadow-sm"
+          className="flex-1 bg-[#171B2A] active:bg-rose-950/40 border border-rose-500/25 rounded-3xl py-4 px-2 items-center justify-center transition-all shadow-sm shadow-rose-950/20"
         >
-          <View className="w-11 h-11 rounded-2xl bg-red-500/15 border border-red-500/30 items-center justify-center mb-2">
-            <Minus size={20} color="#F87171" strokeWidth={2.5} />
+          <View className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 items-center justify-center mb-2.5 shadow-sm">
+            <Minus size={22} color="#F87171" strokeWidth={2.6} />
           </View>
-          <Text className="text-white text-xs font-semibold text-center">
-            Add Expense
+          <Text className="text-white text-xs font-bold text-center">
+            Expense
+          </Text>
+          <Text className="text-slate-400 text-[10px] text-center mt-0.5">
+            Log outflow
           </Text>
         </Pressable>
 
@@ -70,13 +73,16 @@ export function QuickActions({ className = '' }: QuickActionsProps) {
           onPress={handleAddIncome}
           accessibilityRole="button"
           accessibilityLabel="Add Income"
-          className="flex-1 bg-[#151F30] active:bg-slate-800 border border-slate-700/60 rounded-2xl py-3.5 px-2 items-center justify-center transition-all shadow-sm"
+          className="flex-1 bg-[#122227] active:bg-emerald-950/40 border border-emerald-500/25 rounded-3xl py-4 px-2 items-center justify-center transition-all shadow-sm shadow-emerald-950/20"
         >
-          <View className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center mb-2">
-            <Plus size={20} color="#10B981" strokeWidth={2.5} />
+          <View className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center mb-2.5 shadow-sm">
+            <Plus size={22} color="#10B981" strokeWidth={2.6} />
           </View>
-          <Text className="text-white text-xs font-semibold text-center">
-            Add Income
+          <Text className="text-white text-xs font-bold text-center">
+            Income
+          </Text>
+          <Text className="text-slate-400 text-[10px] text-center mt-0.5">
+            Log inflow
           </Text>
         </Pressable>
 
@@ -85,13 +91,16 @@ export function QuickActions({ className = '' }: QuickActionsProps) {
           onPress={handleViewHistory}
           accessibilityRole="button"
           accessibilityLabel="View Transaction History"
-          className="flex-1 bg-[#151F30] active:bg-slate-800 border border-slate-700/60 rounded-2xl py-3.5 px-2 items-center justify-center transition-all shadow-sm"
+          className="flex-1 bg-[#151F30] active:bg-slate-800 border border-slate-700/70 rounded-3xl py-4 px-2 items-center justify-center transition-all shadow-sm"
         >
-          <View className="w-11 h-11 rounded-2xl bg-slate-700/50 border border-slate-600/40 items-center justify-center mb-2">
-            <History size={19} color="#94A3B8" strokeWidth={2.2} />
+          <View className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 items-center justify-center mb-2.5 shadow-sm">
+            <History size={20} color="#94A3B8" strokeWidth={2.2} />
           </View>
-          <Text className="text-white text-xs font-semibold text-center">
-            View History
+          <Text className="text-white text-xs font-bold text-center">
+            History
+          </Text>
+          <Text className="text-slate-400 text-[10px] text-center mt-0.5">
+            All records
           </Text>
         </Pressable>
       </View>
