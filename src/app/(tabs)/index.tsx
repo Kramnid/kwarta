@@ -9,6 +9,7 @@ import {
 } from '@/utils/finance';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { BalanceCard } from '@/components/dashboard/BalanceCard';
+import { AccountsCardsWidget } from '@/components/dashboard/AccountsCardsWidget';
 import { SummaryCard } from '@/components/dashboard/SummaryCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { DashboardSavingsWidget } from '@/components/dashboard/DashboardSavingsWidget';
@@ -72,7 +73,13 @@ export default function HomeScreen() {
           className="mb-3.5"
         />
 
-        {/* 3. Income and Expense Summary (Side-by-side sleek cards) */}
+        {/* 3. Accounts: Debit & Credit Cards */}
+        <AccountsCardsWidget
+          balanceCentavos={summary.totalBalance}
+          className="mb-4"
+        />
+
+        {/* 4. Income and Expense Summary (Side-by-side sleek cards) */}
         <SummaryCard
           incomeCentavos={summary.totalIncome}
           expenseCentavos={summary.totalExpenses}
