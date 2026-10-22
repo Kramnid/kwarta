@@ -28,76 +28,80 @@ export function BalanceCard({
     toggleBalanceHidden();
   };
 
+  const displayAmount = isBalanceHidden
+    ? `${symbol} ••••••`
+    : `${isPositive ? '' : '-'}${symbol} ${formattedAmount}`;
+
   return (
     <View
-      className={`rounded-[28px] overflow-hidden shadow-2xl border border-emerald-400/25 ${className}`}
+      className={`rounded-2xl overflow-hidden border border-slate-700/70 shadow-lg ${className}`}
     >
+      {/* Top emerald signature accent strip */}
+      <View className="h-[3px] bg-emerald-500 w-full" />
+
       <LinearGradient
-        colors={['#047857', '#065F46', '#092923', '#0B1522']}
-        start={{ x: 0.05, y: 0 }}
-        end={{ x: 0.95, y: 1 }}
-        className="p-6"
+        colors={['#172338', '#151F30', '#121A28']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        className="p-5"
       >
-        {/* Top Header Row: Label & Eye Privacy Toggle */}
-        <View className="flex-row items-center justify-between mb-3.5">
+        {/* Top Header Row: Label & Privacy Eye Toggle */}
+        <View className="flex-row items-center justify-between mb-2">
           <View className="flex-row items-center">
-            <View className="w-2.5 h-2.5 rounded-full bg-emerald-400 mr-2 shadow-sm shadow-emerald-400" />
-            <Text className="text-emerald-200 text-xs font-bold tracking-widest uppercase">
+            <View className="w-2 h-2 rounded-full bg-emerald-400 mr-2 shadow-sm shadow-emerald-400" />
+            <Text className="text-slate-400 text-xs font-bold tracking-wider uppercase">
               Total Balance
             </Text>
           </View>
 
-          {/* Privacy Eye Button */}
+          {/* Privacy Eye Toggle Button */}
           <Pressable
             onPress={handleTogglePrivacy}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
             accessibilityLabel={isBalanceHidden ? 'Show balance' : 'Hide balance'}
-            className="flex-row items-center bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded-full active:opacity-70"
+            className="flex-row items-center bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-full active:bg-slate-700"
           >
             {isBalanceHidden ? (
-              <EyeOff size={14} color="#6EE7B7" />
+              <EyeOff size={13} color="#94A3B8" />
             ) : (
-              <Eye size={14} color="#6EE7B7" />
+              <Eye size={13} color="#94A3B8" />
             )}
-            <Text className="text-emerald-300 text-[11px] font-semibold ml-1.5">
-              {isBalanceHidden ? 'Hidden' : 'Hide'}
+            <Text className="text-slate-300 text-xs font-medium ml-1.5">
+              {isBalanceHidden ? 'Show' : 'Hide'}
             </Text>
           </Pressable>
         </View>
 
-        {/* Main Amount Display: Symbol + Number */}
-        <View className="flex-row items-baseline mb-4">
-          <Text className="text-2xl font-bold text-emerald-300 mr-1.5">
-            {symbol}
-          </Text>
+        {/* Main Balance Display: Unified Single Text for Perfect Baseline */}
+        <View className="my-2.5">
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
-            className={`text-4xl font-black tracking-tight ${
-              isPositive ? 'text-white' : 'text-rose-300'
+            className={`text-[36px] font-black tracking-tight ${
+              isPositive ? 'text-white' : 'text-rose-400'
             }`}
           >
-            {isBalanceHidden ? '• • • • • •' : formattedAmount}
+            {displayAmount}
           </Text>
         </View>
 
-        {/* Bottom row: Cash status + Security pill */}
-        <View className="flex-row items-center justify-between pt-3.5 border-t border-emerald-500/20">
+        {/* Bottom Row: Cash status & Privacy badge */}
+        <View className="flex-row items-center justify-between pt-3 border-t border-slate-700/50 mt-1">
           <View className="flex-row items-center">
             {isPositive ? (
-              <TrendingUp size={15} color="#34D399" />
+              <TrendingUp size={14} color="#10B981" />
             ) : (
-              <TrendingDown size={15} color="#F87171" />
+              <TrendingDown size={14} color="#F87171" />
             )}
             <Text className="text-slate-300 text-xs font-medium ml-1.5">
               {isPositive ? 'Available cash balance' : 'Deficit balance'}
             </Text>
           </View>
 
-          <View className="flex-row items-center bg-emerald-950/70 border border-emerald-500/25 px-2.5 py-1 rounded-full">
+          <View className="flex-row items-center bg-slate-800/80 border border-slate-700/60 px-2.5 py-0.5 rounded-full">
             <ShieldCheck size={12} color="#10B981" />
-            <Text className="text-emerald-300 text-[11px] font-semibold ml-1">
+            <Text className="text-emerald-400 text-[11px] font-semibold ml-1">
               Private & Safe
             </Text>
           </View>
