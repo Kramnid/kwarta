@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  Pressable,
+  TouchableOpacity,
   ScrollView,
   LayoutAnimation,
 } from 'react-native';
@@ -66,7 +66,7 @@ export function CategoryPicker({
 
   return (
     <View className={`mb-4 ${className}`}>
-      {/* Label */}
+      {/* Header Label */}
       <View className="flex-row items-center justify-between mb-2 px-0.5">
         <Text className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">
           {label}
@@ -79,8 +79,9 @@ export function CategoryPicker({
       </View>
 
       {/* Dropdown Input Trigger */}
-      <Pressable
+      <TouchableOpacity
         onPress={toggleDropdown}
+        activeOpacity={0.8}
         accessibilityRole="combobox"
         accessibilityLabel={`${label} dropdown`}
         aria-expanded={isOpen}
@@ -106,8 +107,8 @@ export function CategoryPicker({
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
             <View
               style={{
-                width: 34,
-                height: 34,
+                width: 36,
+                height: 36,
                 borderRadius: 10,
                 backgroundColor: `${selectedCategory.color}25`,
                 borderWidth: 1,
@@ -132,8 +133,8 @@ export function CategoryPicker({
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 10 }}>
             <View
               style={{
-                width: 34,
-                height: 34,
+                width: 36,
+                height: 36,
                 borderRadius: 10,
                 backgroundColor: '#1E293B',
                 alignItems: 'center',
@@ -149,7 +150,7 @@ export function CategoryPicker({
           </View>
         )}
 
-        {/* Dropdown Chevron */}
+        {/* Dropdown Chevron Indicator */}
         <View
           style={{
             width: 30,
@@ -168,7 +169,7 @@ export function CategoryPicker({
             <ChevronDown size={16} color="#94A3B8" />
           )}
         </View>
-      </Pressable>
+      </TouchableOpacity>
 
       {/* Dropdown List Menu (Revealed on Open) */}
       {isOpen && (
@@ -187,7 +188,8 @@ export function CategoryPicker({
           <ScrollView
             nestedScrollEnabled
             showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingVertical: 4 }}
+            contentContainerStyle={{ paddingVertical: 2 }}
+            style={{ width: '100%' }}
           >
             {availableCategories.map((cat, index) => {
               const isSelected = cat.id === selectedCategoryId;
@@ -195,12 +197,13 @@ export function CategoryPicker({
               const isLast = index === availableCategories.length - 1;
 
               return (
-                <Pressable
+                <TouchableOpacity
                   key={cat.id}
                   onPress={() => handleSelect(cat.id, isDisabled)}
+                  activeOpacity={0.7}
                   accessibilityRole="menuitem"
                   accessibilityLabel={cat.name}
-                  style={({ pressed }) => ({
+                  style={{
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -208,20 +211,18 @@ export function CategoryPicker({
                     paddingVertical: 12,
                     backgroundColor: isSelected
                       ? 'rgba(16, 185, 129, 0.12)'
-                      : pressed
-                      ? '#1E293B'
                       : 'transparent',
                     borderBottomWidth: isLast ? 0 : 1,
                     borderBottomColor: 'rgba(51, 65, 85, 0.35)',
                     opacity: isDisabled ? 0.45 : 1,
-                  })}
+                  }}
                 >
                   {/* Left: Icon + Name */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 12 }}>
                     <View
                       style={{
-                        width: 32,
-                        height: 32,
+                        width: 34,
+                        height: 34,
                         borderRadius: 10,
                         backgroundColor: `${cat.color}20`,
                         borderWidth: 1,
@@ -231,7 +232,7 @@ export function CategoryPicker({
                         marginRight: 12,
                       }}
                     >
-                      <CategoryIcon name={cat.icon} color={cat.color} size={17} />
+                      <CategoryIcon name={cat.icon} color={cat.color} size={18} />
                     </View>
                     <Text
                       numberOfLines={1}
@@ -245,7 +246,7 @@ export function CategoryPicker({
                     </Text>
                   </View>
 
-                  {/* Right: Checkmark or Disabled Badge */}
+                  {/* Right: Checkmark on Selected Item */}
                   {isSelected && (
                     <View
                       style={{
@@ -261,6 +262,7 @@ export function CategoryPicker({
                     </View>
                   )}
 
+                  {/* Right: Disabled / Budgeted Tag */}
                   {isDisabled && (
                     <View
                       style={{
@@ -277,7 +279,7 @@ export function CategoryPicker({
                       </Text>
                     </View>
                   )}
-                </Pressable>
+                </TouchableOpacity>
               );
             })}
           </ScrollView>
