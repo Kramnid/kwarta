@@ -4,6 +4,7 @@
 
 export * from './finance';
 export * from './budget';
+export * from './analytics';
 
 export interface Category {
   id: string | number;

@@ -127,3 +127,23 @@ export function parseCurrencyInput(input: string): number {
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? 0 : parsed;
 }
+
+/**
+ * Formats centavos into a compact string suitable for chart axes and small badges.
+ * Examples: 0 -> "₱0", 50000 -> "₱500", 150000 -> "₱1.5k", 1000000 -> "₱10k"
+ */
+export function formatCompactCentavosToPhp(centavos: number): string {
+  if (isNaN(centavos) || !isFinite(centavos) || centavos <= 0) {
+    return '₱0';
+  }
+  const pesos = centavos / 100;
+  if (pesos >= 1_000_000) {
+    const m = (pesos / 1_000_000).toFixed(1).replace(/\.0$/, '');
+    return `₱${m}M`;
+  }
+  if (pesos >= 1_000) {
+    const k = (pesos / 1_000).toFixed(1).replace(/\.0$/, '');
+    return `₱${k}k`;
+  }
+  return `₱${Math.round(pesos)}`;
+}

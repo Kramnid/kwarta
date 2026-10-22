@@ -1,155 +1,162 @@
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { ChartNoAxesCombined, PieChart, TrendingDown, TrendingUp } from 'lucide-react-native';
-import { useAppStore } from '@/store';
+import React, { useState, useCallback } from 'react';
 import {
-  calculateDashboardSummary,
-  calculateSpendingByCategory,
-} from '@/utils/finance';
-import { formatCentavosToPhp } from '@/utils/currency';
-import { formatCurrentMonth } from '@/utils/date';
-import { Card } from '@/components/ui/Card';
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { Lightbulb } from 'lucide-react-native';
+import { useAnalyticsData } from '@/hooks/useAnalyticsData';
+import {
+  InsightsHeader,
+  DateRangeSelector,
+  FinancialOverviewCards,
+  IncomeExpenseChart,
+  SpendingBreakdownChart,
+  CategorySpendingList,
+  SpendingTrendsChart,
+  FinancialInsightCard,
+  BudgetPerformanceCard,
+  InsightsEmptyState,
+} from '@/components/insights';
 
 export default function InsightsScreen() {
-  const { transactions } = useAppStore();
-  const currentMonth = formatCurrentMonth();
+  const {
+    analytics,
+    selectedOption,
+    customStartDate,
+    customEndDate,
+    setRangeOption,
+    setCustomRange,
+    refresh,
+    error,
+  } = useAnalyticsData();
 
-  const summary = useMemo(
-    () => calculateDashboardSummary(transactions),
-    [transactions]
-  );
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
-  const categories = useMemo(
-    () => calculateSpendingByCategory(transactions),
-    [transactions]
-  );
-
-  const savingsRate =
-    summary.totalIncome > 0
-      ? Math.max(0, Math.round(((summary.totalIncome - summary.totalExpenses) / summary.totalIncome) * 100))
-      : 0;
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refresh]);
 
   return (
-    <ScrollView
-      className="flex-1 bg-[#0B1220]"
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Month & Highlights */}
-      <View className="mb-5">
-        <Text className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
-          {currentMonth}
-        </Text>
-        <Text className="text-white text-2xl font-bold mt-0.5">
-          Spending Analytics
-        </Text>
-      </View>
+    <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-[#0B1220]">
+      <StatusBar style="light" />
 
-      {/* Cash Flow Highlights */}
-      <View className="flex-row gap-3 mb-5">
-        <View className="flex-1 bg-[#151F30] rounded-2xl p-4 border border-slate-700/60">
-          <View className="flex-row items-center mb-2">
-            <TrendingUp size={16} color="#10B981" />
-            <Text className="text-slate-400 text-xs font-semibold uppercase ml-1.5">
-              Savings Rate
-            </Text>
-          </View>
-          <Text className="text-emerald-400 text-2xl font-extrabold">
-            {savingsRate}%
-          </Text>
-          <Text className="text-slate-400 text-[11px] mt-0.5">
-            of income preserved
-          </Text>
-        </View>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 100,
+        }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor="#10B981"
+            colors={['#10B981']}
+          />
+        }
+      >
+        {/* 1. Header */}
+        <InsightsHeader rangeLabel={analytics.range.label} />
 
-        <View className="flex-1 bg-[#151F30] rounded-2xl p-4 border border-slate-700/60">
-          <View className="flex-row items-center mb-2">
-            <TrendingDown size={16} color="#F87171" />
-            <Text className="text-slate-400 text-xs font-semibold uppercase ml-1.5">
-              Net Expenses
-            </Text>
-          </View>
-          <Text className="text-rose-400 text-2xl font-extrabold">
-            {formatCentavosToPhp(summary.totalExpenses)}
-          </Text>
-          <Text className="text-slate-400 text-[11px] mt-0.5">
-            across {categories.length} categories
-          </Text>
-        </View>
-      </View>
+        {/* 2. Date Range Selector */}
+        <DateRangeSelector
+          selectedOption={selectedOption}
+          onSelectOption={(option) => {
+            setSelectedCategoryId(null);
+            setRangeOption(option);
+          }}
+          customStartDate={customStartDate}
+          customEndDate={customEndDate}
+          onSetCustomRange={(start, end) => {
+            setSelectedCategoryId(null);
+            setCustomRange(start, end);
+          }}
+        />
 
-      {/* Category Distribution Breakdown */}
-      <Card className="mb-6">
-        <View className="flex-row items-center justify-between mb-4 pb-3 border-b border-slate-700/50">
-          <View className="flex-row items-center">
-            <PieChart size={18} color="#10B981" />
-            <Text className="text-white font-bold text-base ml-2">
-              Category Distribution
-            </Text>
-          </View>
-          <Text className="text-slate-400 text-xs font-semibold">
-            By Percentage
-          </Text>
-        </View>
-
-        {categories.length === 0 ? (
-          <View className="py-8 items-center justify-center">
-            <Text className="text-slate-400 text-xs text-center">
-              No expense activity recorded yet.
-            </Text>
-          </View>
-        ) : (
-          <View className="gap-4">
-            {categories.map((item) => (
-              <View key={`insight-cat-${item.categoryId}-${item.categoryName}`}>
-                <View className="flex-row items-center justify-between mb-1.5">
-                  <View className="flex-row items-center flex-1 mr-2">
-                    <View
-                      style={{ backgroundColor: item.categoryColor || '#94A3B8' }}
-                      className="w-3 h-3 rounded-full mr-2.5"
-                    />
-                    <Text className="text-slate-200 text-xs font-semibold">
-                      {item.categoryName}
-                    </Text>
-                  </View>
-
-                  <View className="flex-row items-center">
-                    <Text className="text-white text-xs font-bold mr-2">
-                      {formatCentavosToPhp(item.amount)}
-                    </Text>
-                    <Text className="text-slate-400 text-xs font-medium w-12 text-right">
-                      {item.percentage.toFixed(1)}%
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                  <View
-                    style={{
-                      width: `${Math.min(Math.max(item.percentage, 0), 100)}%`,
-                      backgroundColor: item.categoryColor || '#10B981',
-                    }}
-                    className="h-full rounded-full"
-                  />
-                </View>
-              </View>
-            ))}
-          </View>
+        {/* Error State */}
+        {error && (
+          <InsightsEmptyState
+            type="error"
+            errorMessage={error}
+            onRetry={handleRefresh}
+          />
         )}
-      </Card>
 
-      {/* Next Steps Card */}
-      <Card elevated>
-        <View className="flex-row items-center mb-2">
-          <ChartNoAxesCombined size={16} color="#10B981" />
-          <Text className="text-white font-semibold text-sm ml-2">
-            Interactive Visualizations
-          </Text>
-        </View>
-        <Text className="text-slate-400 text-xs leading-5">
-          Detailed monthly trend charts, category breakdowns, and custom budget limits are coming in future updates.
-        </Text>
-      </Card>
-    </ScrollView>
+        {/* Empty State: No Transactions Recorded */}
+        {!error && !analytics.hasAnyTransactions && (
+          <InsightsEmptyState type="no_transactions" />
+        )}
+
+        {/* Content Loaded */}
+        {!error && analytics.hasAnyTransactions && (
+          <>
+            {/* 3. Financial Overview Cards (Income, Expenses, Net Flow, Savings Rate, Daily Average) */}
+            <FinancialOverviewCards
+              overview={analytics.overview}
+              dailySpending={analytics.dailySpending}
+            />
+
+            {/* 4. Income vs. Expenses Chart */}
+            <IncomeExpenseChart buckets={analytics.incomeExpenseBuckets} />
+
+            {/* 5. Spending Breakdown (Donut Chart + Category List) */}
+            <SpendingBreakdownChart
+              categories={analytics.categorySpending}
+              totalExpenses={analytics.overview.totalExpenses}
+              selectedCategoryId={selectedCategoryId}
+              onSelectCategory={setSelectedCategoryId}
+            />
+
+            <CategorySpendingList
+              categories={analytics.categorySpending}
+              selectedCategoryId={selectedCategoryId}
+              onSelectCategory={setSelectedCategoryId}
+            />
+
+            {/* 6. Spending Trends Chart */}
+            <SpendingTrendsChart points={analytics.spendingTrendPoints} />
+
+            {/* 7. Smart Financial Insights ("Your Money Insights") */}
+            <View className="mb-6">
+              <View className="flex-row items-center mb-3">
+                <View className="w-7 h-7 rounded-lg bg-emerald-500/10 items-center justify-center mr-2">
+                  <Lightbulb size={15} color="#10B981" />
+                </View>
+                <Text className="text-white font-bold text-base">
+                  Your Money Insights
+                </Text>
+              </View>
+
+              {analytics.insights.length > 0 ? (
+                analytics.insights.map((insight) => (
+                  <FinancialInsightCard key={insight.id} insight={insight} />
+                ))
+              ) : (
+                <View className="bg-[#151F30] rounded-xl p-4 border border-slate-700/60">
+                  <Text className="text-slate-400 text-xs text-center">
+                    No special observations for this period.
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* 8. Budget Performance Card */}
+            <BudgetPerformanceCard performance={analytics.budgetPerformance} />
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
