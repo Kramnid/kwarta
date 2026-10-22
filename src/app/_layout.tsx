@@ -2,8 +2,15 @@ import React from 'react';
 import { Stack, DarkTheme, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useDatabase } from '@/hooks/useDatabase';
 import '../../global.css';
+
+// Disable Reanimated strict-mode warning triggered during render by external libraries (NativeWind / React Navigation)
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 const kwartaDarkTheme = {
   ...DarkTheme,
