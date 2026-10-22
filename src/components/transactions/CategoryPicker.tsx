@@ -1,17 +1,9 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  Pressable,
-  ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronDown, Check, X } from 'lucide-react-native';
+import React from 'react';
+import { View, Text, Pressable } from 'react-native';
+import { Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { TransactionCategory, TransactionType } from '@/types/finance';
 import { CategoryIcon } from './CategoryIcon';
-import { Card } from '@/components/ui/Card';
 
 interface CategoryPickerProps {
   categories: TransactionCategory[];
@@ -19,7 +11,10 @@ interface CategoryPickerProps {
   type: TransactionType;
   onSelect: (categoryId: string) => void;
   error?: string;
+  disabledCategoryIds?: Set<string>;
+  disabledMessage?: string;
   className?: string;
+  label?: string;
 }
 
 export function CategoryPicker({
@@ -28,156 +23,169 @@ export function CategoryPicker({
   type,
   onSelect,
   error,
+  disabledCategoryIds,
+  disabledMessage = 'Already budgeted for this month',
   className = '',
+  label = 'Select Category',
 }: CategoryPickerProps) {
-  const [modalVisible, setModalVisible] = useState(false);
-
   // Filter categories to only show ones matching active transaction type
   const availableCategories = categories.filter((c) => c.type === type);
-  const selectedCategory = availableCategories.find(
-    (c) => c.id === selectedCategoryId
-  );
+  const selectedCategory = availableCategories.find((c) => c.id === selectedCategoryId);
 
-  const handleOpen = () => {
+  const handleSelect = (categoryId: string, isDisabled: boolean) => {
+    if (isDisabled) {
+      try {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      } catch {}
+      return;
+    }
+
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {
-      // Fallback
-    }
-    setModalVisible(true);
-  };
-
-  const handleSelect = (categoryId: string) => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    } catch {
-      // Fallback
-    }
+    } catch {}
     onSelect(categoryId);
-    setModalVisible(false);
   };
 
   return (
     <View className={`mb-4 ${className}`}>
-      <Text className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-        Category
-      </Text>
-
-      <Pressable
-        onPress={handleOpen}
-        accessibilityRole="button"
-        accessibilityLabel="Select category"
-      >
-        <Card
-          className={`flex-row items-center justify-between py-3.5 border ${
-            error ? 'border-red-500/80' : 'border-slate-700/60'
-          }`}
-        >
-          {selectedCategory ? (
-            <View className="flex-row items-center flex-1 mr-2">
-              <View
-                style={{ backgroundColor: `${selectedCategory.color}25` }}
-                className="w-10 h-10 rounded-xl items-center justify-center mr-3 border border-white/5"
-              >
-                <CategoryIcon
-                  name={selectedCategory.icon}
-                  color={selectedCategory.color}
-                  size={20}
-                />
-              </View>
-              <Text className="text-white text-base font-semibold">
-                {selectedCategory.name}
-              </Text>
-            </View>
-          ) : (
-            <View className="flex-row items-center flex-1 mr-2">
-              <View className="w-10 h-10 rounded-xl bg-slate-800 items-center justify-center mr-3">
-                <Text className="text-slate-400 text-lg">?</Text>
-              </View>
-              <Text className="text-slate-500 text-base">Select Category</Text>
-            </View>
-          )}
-
-          <ChevronDown size={20} color="#94A3B8" />
-        </Card>
-      </Pressable>
-
-      {error ? (
-        <Text className="text-red-400 text-xs mt-1.5 font-medium">{error}</Text>
-      ) : null}
-
-      {/* Category Selection Modal */}
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <SafeAreaView className="flex-1 bg-[#0B1220]/95 justify-end">
-          <View className="bg-[#151F30] rounded-t-3xl border-t border-slate-700/80 max-h-[80%] flex-1">
-            {/* Modal Header */}
-            <View className="flex-row items-center justify-between px-6 py-4 border-b border-slate-700/60">
-              <Text className="text-white text-lg font-bold">
-                Select {type === 'income' ? 'Income' : 'Expense'} Category
-              </Text>
-              <Pressable
-                onPress={() => setModalVisible(false)}
-                hitSlop={8}
-                className="w-8 h-8 rounded-full bg-slate-800 items-center justify-center active:bg-slate-700"
-              >
-                <X size={18} color="#94A3B8" />
-              </Pressable>
-            </View>
-
-            {/* Categories Grid List */}
-            <ScrollView
-              contentContainerStyle={{ padding: 20 }}
-              showsVerticalScrollIndicator={false}
+      {/* Header */}
+      <View className="flex-row items-center justify-between mb-2.5 px-0.5">
+        <Text className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+          {label}
+        </Text>
+        {selectedCategory && (
+          <View className="flex-row items-center">
+            <View
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: selectedCategory.color,
+                marginRight: 6,
+              }}
+            />
+            <Text
+              style={{ color: selectedCategory.color, fontSize: 12, fontWeight: '700' }}
             >
-              <View className="gap-2.5">
-                {availableCategories.map((cat) => {
-                  const isSelected = cat.id === selectedCategoryId;
-                  return (
-                    <Pressable
-                      key={cat.id}
-                      onPress={() => handleSelect(cat.id)}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Category ${cat.name}`}
-                      className={`flex-row items-center justify-between p-3.5 rounded-2xl border transition-all ${
-                        isSelected
-                          ? 'bg-slate-800 border-emerald-500/60'
-                          : 'bg-slate-800/40 border-slate-700/40 active:bg-slate-800'
-                      }`}
-                    >
-                      <View className="flex-row items-center flex-1 mr-2">
-                        <View
-                          style={{ backgroundColor: `${cat.color}25` }}
-                          className="w-11 h-11 rounded-xl items-center justify-center mr-3.5 border border-white/5"
-                        >
-                          <CategoryIcon
-                            name={cat.icon}
-                            color={cat.color}
-                            size={20}
-                          />
-                        </View>
-                        <Text className="text-white font-semibold text-base">
-                          {cat.name}
-                        </Text>
-                      </View>
-
-                      {isSelected && (
-                        <View className="w-6 h-6 rounded-full bg-emerald-500 items-center justify-center">
-                          <Check size={14} color="#FFFFFF" strokeWidth={3} />
-                        </View>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </ScrollView>
+              {selectedCategory.name}
+            </Text>
           </View>
-        </SafeAreaView>
-      </Modal>
+        )}
+      </View>
+
+      {/* Visual Category Grid */}
+      <View
+        style={{
+          backgroundColor: '#151F30',
+          borderRadius: 20,
+          padding: 12,
+          borderWidth: 1.5,
+          borderColor: error ? 'rgba(248, 113, 113, 0.8)' : 'rgba(51, 65, 85, 0.7)',
+        }}
+      >
+        <View className="flex-row flex-wrap justify-between">
+          {availableCategories.map((cat) => {
+            const isSelected = cat.id === selectedCategoryId;
+            const isDisabled = !!disabledCategoryIds?.has(cat.id);
+
+            return (
+              <Pressable
+                key={cat.id}
+                onPress={() => handleSelect(cat.id, isDisabled)}
+                accessibilityRole="button"
+                accessibilityLabel={cat.name}
+                style={{
+                  width: '31%',
+                  marginBottom: 10,
+                  paddingVertical: 10,
+                  paddingHorizontal: 6,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: isSelected
+                    ? `${cat.color}22`
+                    : isDisabled
+                    ? '#0F172A'
+                    : '#1E293B',
+                  borderWidth: 1.5,
+                  borderColor: isSelected
+                    ? cat.color
+                    : isDisabled
+                    ? '#1E293B'
+                    : 'rgba(51, 65, 85, 0.6)',
+                  opacity: isDisabled ? 0.45 : 1,
+                  position: 'relative',
+                }}
+              >
+                {/* Active Checkmark Badge */}
+                {isSelected && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      width: 16,
+                      height: 16,
+                      borderRadius: 8,
+                      backgroundColor: cat.color,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Check size={10} color="#0B1220" strokeWidth={3} />
+                  </View>
+                )}
+
+                {/* Category Icon */}
+                <View
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 12,
+                    backgroundColor: isSelected ? `${cat.color}33` : `${cat.color}15`,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 6,
+                  }}
+                >
+                  <CategoryIcon name={cat.icon} color={cat.color} size={19} />
+                </View>
+
+                {/* Category Name */}
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: isSelected ? '800' : '600',
+                    color: isSelected ? '#FFFFFF' : '#CBD5E1',
+                    textAlign: 'center',
+                  }}
+                >
+                  {cat.name}
+                </Text>
+
+                {/* Disabled Badge */}
+                {isDisabled && (
+                  <Text
+                    style={{
+                      fontSize: 9,
+                      fontWeight: '700',
+                      color: '#94A3B8',
+                      marginTop: 2,
+                    }}
+                  >
+                    Budgeted
+                  </Text>
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {error && (
+          <Text className="text-red-400 text-xs mt-1 font-medium px-1">{error}</Text>
+        )}
+      </View>
     </View>
   );
 }

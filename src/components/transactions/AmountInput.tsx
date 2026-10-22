@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Card } from '@/components/ui/Card';
 
 interface AmountInputProps {
@@ -8,6 +9,9 @@ interface AmountInputProps {
   type: 'expense' | 'income';
   error?: string;
   className?: string;
+  quickAmounts?: number[];
+  label?: string;
+  autoFocus?: boolean;
 }
 
 /**
@@ -45,26 +49,33 @@ export function AmountInput({
   type,
   error,
   className = '',
+  quickAmounts = [50, 100, 500, 1000],
+  label = 'Amount',
+  autoFocus = false,
 }: AmountInputProps) {
+  const [isFocused, setIsFocused] = useState(false);
   const isIncome = type === 'income';
-  const accentColor = isIncome ? 'text-emerald-400' : 'text-rose-400';
+  const currencyColor = isIncome ? '#10B981' : '#F87171';
+  const activeBorderColor = error
+    ? 'rgba(248, 113, 113, 0.8)'
+    : isFocused
+    ? isIncome
+      ? 'rgba(16, 185, 129, 0.7)'
+      : 'rgba(248, 113, 113, 0.7)'
+    : 'rgba(51, 65, 85, 0.7)';
 
   const handleChange = (text: string) => {
-    // Strip everything except digits and single dot
     let cleaned = text.replace(/[^0-9.]/g, '');
 
-    // Allow at most one decimal point
     const parts = cleaned.split('.');
     if (parts.length > 2) {
       cleaned = `${parts[0]}.${parts.slice(1).join('')}`;
     }
 
-    // Limit decimal places to maximum 2
     if (parts.length === 2 && parts[1].length > 2) {
       cleaned = `${parts[0]}.${parts[1].substring(0, 2)}`;
     }
 
-    // Prevent leading zeros unless followed by decimal point (e.g. "0.5")
     if (cleaned.length > 1 && cleaned.startsWith('0') && cleaned[1] !== '.') {
       cleaned = cleaned.replace(/^0+/, '');
     }
@@ -72,44 +83,123 @@ export function AmountInput({
     onChangeText(cleaned);
   };
 
+  const handleQuickAdd = (incrementPesos: number) => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {}
+
+    const currentCentavos = stringToCentavos(value);
+    const newCentavos = currentCentavos + incrementPesos * 100;
+    onChangeText(centavosToEditableString(newCentavos));
+  };
+
+  const handleClear = () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {}
+    onChangeText('');
+  };
+
   return (
-    <Card className={`mb-4 border ${error ? 'border-red-500/80' : 'border-slate-700/60'} ${className}`}>
-      <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
-          Amount
+    <Card
+      style={{
+        borderColor: activeBorderColor,
+        borderWidth: 1.5,
+        backgroundColor: '#151F30',
+        borderRadius: 20,
+        padding: 18,
+        marginBottom: 16,
+      }}
+      className={className}
+    >
+      <View className="flex-row items-center justify-between mb-1.5">
+        <Text className="text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+          {label}
         </Text>
-        <Text className="text-slate-500 text-xs">PHP (₱)</Text>
+        <Text className="text-slate-500 text-[11px] font-semibold">Philippine Peso (PHP)</Text>
       </View>
 
-      <View className="flex-row items-center py-1">
-        <Text className={`text-4xl font-extrabold mr-2 ${accentColor}`}>
+      <View className="flex-row items-baseline py-1">
+        <Text
+          style={{
+            fontSize: 36,
+            fontWeight: '900',
+            color: currencyColor,
+            marginRight: 6,
+          }}
+        >
           ₱
         </Text>
         <TextInput
           value={value}
           onChangeText={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           placeholder="0.00"
           placeholderTextColor="#475569"
           keyboardType="decimal-pad"
-          autoFocus={false}
-          className="flex-1 text-4xl font-extrabold text-white py-1"
-          style={{ minHeight: 48 }}
+          autoFocus={autoFocus}
+          style={{
+            flex: 1,
+            fontSize: 38,
+            fontWeight: '900',
+            color: '#FFFFFF',
+            minHeight: 52,
+            paddingVertical: 0,
+          }}
           accessibilityLabel="Transaction amount"
         />
         {value.length > 0 && (
           <Pressable
-            onPress={() => onChangeText('')}
-            hitSlop={8}
-            className="w-7 h-7 rounded-full bg-slate-800 items-center justify-center active:bg-slate-700 ml-2"
+            onPress={handleClear}
+            hitSlop={10}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: '#1E293B',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: 8,
+              borderWidth: 1,
+              borderColor: '#334155',
+            }}
             accessibilityLabel="Clear amount"
           >
-            <Text className="text-slate-400 text-xs font-bold">✕</Text>
+            <Text style={{ color: '#94A3B8', fontSize: 13, fontWeight: '700' }}>✕</Text>
           </Pressable>
         )}
       </View>
 
+      {/* Quick Add Chips */}
+      {quickAmounts && quickAmounts.length > 0 && (
+        <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(51, 65, 85, 0.4)' }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+            {quickAmounts.map((amt) => (
+              <Pressable
+                key={`quick-${amt}`}
+                onPress={() => handleQuickAdd(amt)}
+                style={{
+                  backgroundColor: '#1E293B',
+                  borderWidth: 1,
+                  borderColor: '#334155',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 10,
+                  marginRight: 8,
+                }}
+              >
+                <Text style={{ color: '#E2E8F0', fontSize: 12, fontWeight: '700' }}>
+                  +₱{amt.toLocaleString()}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       {error ? (
-        <Text className="text-red-400 text-xs mt-2 font-medium">{error}</Text>
+        <Text className="text-red-400 text-xs mt-2.5 font-medium">{error}</Text>
       ) : null}
     </Card>
   );
